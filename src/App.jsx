@@ -46,10 +46,14 @@ const MOCK_ROOMS = [
     id: 1,
     name: "Standard Room",
     images: [
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=1000",
+      "/Room1.jpg",
+      "/Room2.jpg",
+      "/Room3.jpg",
+      "/Bathroom1.jpg"
     ],
     description:
       "The Standard Room is designed to provide a comfortable and affordable stay for solo travelers or couples. The room features a cozy bed, modern furnishings, air conditioning, free Wi-Fi, a flat-screen TV, and a clean private bathroom with essential toiletries. It offers a peaceful environment where guests can relax after a long day of travel or work. Perfect for short stays, the Standard Room combines comfort, convenience, and value.",
@@ -105,10 +109,14 @@ const MOCK_ROOMS = [
     id: 2,
     name: "Deluxe Room",
     images: [
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=1000",
+      "/Room4.jpg",
+    "/Room5.jpg",
+    "/Room6.jpg",
+    "/Bathroom1.jpg"
     ],
     description:
       "The Deluxe Room offers a more spacious and luxurious experience for guests who want extra comfort. This room includes a large comfortable bed, elegant interior design, air conditioning, high-speed Wi-Fi, a smart TV, wardrobe space, and a modern attached bathroom. Guests can enjoy additional seating space and enhanced room amenities that make their stay more relaxing and enjoyable. The Deluxe Room is ideal for couples or business travelers seeking a premium stay experience.",
@@ -164,10 +172,14 @@ const MOCK_ROOMS = [
     id: 3,
     name: "Family Room",
     images: [
-      "https://images.unsplash.com/photo-1560067174-05a3a8fac815?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1574643156929-51fa098b0394?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1598928506311-c55dd580e5cb?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1560067174-05a3a8fac815?auto=format&fit=crop&q=80&w=1000",
+     // "https://images.unsplash.com/photo-1574643156929-51fa098b0394?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=1000",
+      //"https://images.unsplash.com/photo-1598928506311-c55dd580e5cb?auto=format&fit=crop&q=80&w=1000",
+      "/Room7.jpg",
+    "/Room8.jpg",
+    "/Room6.jpg",
+    "/Bathroom1.jpg"
     ],
     description:
       "The Family Room is specially designed for families or groups traveling together. It provides a larger living space with multiple beds to comfortably accommodate several guests. The room includes air conditioning, free Wi-Fi, a flat-screen TV, spacious seating area, wardrobe, and a fully equipped private bathroom. With its roomy layout and comfortable amenities, the Family Room ensures that families can enjoy a relaxing and memorable stay together.",
@@ -401,7 +413,7 @@ Special Request: ${guestInfo.message || "None"}`;
             <img
               src="Hotel Logo.jpg"
               alt="Hotel Marella Royal Inn Logo"
-              className="h-20 w-auto object-contain group-hover:scale-105 transition-transform mr-4"
+              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mr-4"
               onError={(e) => {
                 e.target.style.display = "none";
               }}
@@ -467,7 +479,7 @@ Contact
               <img
                 src="Hotel Logo.jpg"
                 alt="Hotel Marella Royal Inn Logo"
-                className="h-20 object-contain"
+                className="h-16 object-contain"
                 onError={(e) => {
                   e.target.parentElement.style.display = "none";
                 }}
@@ -540,15 +552,15 @@ function HomeView({ rooms, onSelectRoom }) {
     <div className="animate-in fade-in duration-500 bg-white">
       {/* Hero Banner with Video */}
       <div className="relative h-[65vh] bg-black flex items-center justify-center border-b-8 border-[#FFC107] overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/reception.mp4" type="video/mp4" />
-        </video>
+       <video
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="absolute inset-0 w-full h-full object-cover"
+>
+  <source src={`${import.meta.env.BASE_URL}reception.mp4`} type="video/mp4" />
+</video>
 
         <div className="absolute inset-0 bg-black/50"></div>
 
