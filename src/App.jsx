@@ -56,9 +56,9 @@ const MOCK_ROOMS = [
     id: 1,
     name: "Standard Room",
     images: [
-  room1,
-  room2,
-  room3,
+  room5,
+  room4,
+  room6,
   bathroom1
 ],
     description:
@@ -116,8 +116,9 @@ const MOCK_ROOMS = [
     name: "Deluxe Room",
      images: [
   room4,
-  room5,
-  room6,
+  room1,
+  room2,
+  room3,
   bathroom1
 ],
     description:
@@ -174,9 +175,10 @@ const MOCK_ROOMS = [
     id: 3,
     name: "Family Room",
      images: [
-  room6,
-  room7,
+  room1,
   room8,
+  room4,
+  room2,
   bathroom1
 ],
     description:
@@ -297,60 +299,68 @@ export default function App() {
     setCurrentView("checkout");
     window.scrollTo(0, 0);
   };
+const handleConfirmBooking = (guestInfo, paymentMethod) => {
+  const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
 
-  const handleConfirmBooking = (guestInfo, paymentMethod) => {
-    const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
+  const bookingData = {
+    guestName: guestInfo.guestName,
+    email: guestInfo.email,
+    phone: guestInfo.phone,
+    roomName: selectedRoom.name,
+    guests: bookingDetails.guests,
+    checkIn: bookingDetails.checkIn,
+    checkOut: bookingDetails.checkOut,
+    totalPrice: bookingDetails.total,
+    paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card",
+    bookingReference: bookingReference,
+  };
 
-    setBookingDetails((prev) => ({
-      ...prev,
-      ...guestInfo,
-      paymentMethod,
-      bookingReference,
-    }));
-
-    // EmailJS template parameters
-    const templateParams = {
-      booking_reference: bookingReference,
-      guest_name: guestInfo.guestName,
-      guest_email: guestInfo.email,
-      guest_phone: guestInfo.phone,
-      room_name: selectedRoom.name,
-      guests: bookingDetails.guests,
-      check_in: bookingDetails.checkIn,
-      check_out: bookingDetails.checkOut,
-      total: bookingDetails.total,
-      payment_method: paymentMethod === "hotel" ? "Pay at Hotel" : "Card",
-      special_request: guestInfo.message || "None",
-    };
-
-    // Using standard fetch API instead of external dependency to ensure compatibility
-    fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        service_id: "service_79vxn5l", // Your Service ID from the screenshot
-        template_id: "template_hj48bne", // Get this from Email Templates -> Settings
-        user_id: "n94jEJBXkDeCf_eH4", // Get this from Account -> API Keys
-        template_params: templateParams,
-      }),
+  // 1️⃣ Save booking in Spring Boot database
+  fetch("http://localhost:8080/api/bookings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bookingData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Booking saved:", data);
     })
-      .then((response) => {
-        if (response.ok) {
-          console.log("SUCCESS! Email sent to hotel.");
-        } else {
-          console.error(
-            "FAILED to send email. Check Template ID and Public Key.",
-          );
-        }
-      })
-      .catch((err) => {
-        console.error("FAILED to send email.", err);
-      });
+    .catch((error) => {
+      console.error("Error saving booking:", error);
+    });
 
-    // 2. Open WhatsApp automatically for the guest to send to the Hotel
-    const messageDetails = `*New Booking Request!*
+  // 2️⃣ Send Email
+  const templateParams = {
+    booking_reference: bookingReference,
+    guest_name: guestInfo.guestName,
+    guest_email: guestInfo.email,
+    guest_phone: guestInfo.phone,
+    room_name: selectedRoom.name,
+    guests: bookingDetails.guests,
+    check_in: bookingDetails.checkIn,
+    check_out: bookingDetails.checkOut,
+    total: bookingDetails.total,
+    payment_method: bookingData.paymentMethod,
+    special_request: guestInfo.message || "None",
+  };
+
+  fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      service_id: "service_79vxn5l",
+      template_id: "template_hj48bne",
+      user_id: "n94jEJBXkDeCf_eH4",
+      template_params: templateParams,
+    }),
+  });
+
+  // 3️⃣ WhatsApp message
+  const messageDetails = `*New Booking Request!*
 
 Booking Reference: ${bookingReference}
 
@@ -364,22 +374,22 @@ Dates: ${bookingDetails.checkIn} to ${bookingDetails.checkOut}
 
 Total: ₹${bookingDetails.total}
 
-Payment: ${paymentMethod === "hotel" ? "Pay at Hotel" : "Card"}
+Payment: ${bookingData.paymentMethod}
 
 Special Request: ${guestInfo.message || "None"}`;
 
-    // IMPORTANT: Replace with your hotel's actual WhatsApp number (include country code '91', no '+' or spaces)
-    const hotelWhatsAppNumber = "917780423648";
-    const whatsappUrl = `https://wa.me/${hotelWhatsAppNumber}?text=${encodeURIComponent(messageDetails)}`;
+  const hotelWhatsAppNumber = "917780423648";
 
-    // Opens WhatsApp Web or App in a new tab
-    window.open(whatsappUrl, "_blank");
+  const whatsappUrl = `https://wa.me/${hotelWhatsAppNumber}?text=${encodeURIComponent(messageDetails)}`;
 
-    setTimeout(() => {
-      setCurrentView("success");
-      window.scrollTo(0, 0);
-    }, 1000);
-  };
+  window.open(whatsappUrl, "_blank");
+
+  // 4️⃣ Success page
+  setTimeout(() => {
+    setCurrentView("success");
+    window.scrollTo(0, 0);
+  }, 1000);
+};
 
   const goHome = () => {
     setCurrentView("home");
