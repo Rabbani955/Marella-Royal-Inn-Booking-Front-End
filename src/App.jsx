@@ -50,6 +50,8 @@ import room8 from "./assets/Room8.jpg";
 import bathroom1 from "./assets/Bathroom1.jpg";
 
 
+
+
 // --- MOCK DATA (Simulating Spring Boot GET /api/rooms) ---
 const MOCK_ROOMS = [
   {
@@ -272,6 +274,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState("home");
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [adminBookings, setAdminBookings] = useState([]);
   const [bookingDetails, setBookingDetails] = useState({
     checkIn: "",
     checkOut: "",
@@ -284,9 +287,29 @@ export default function App() {
     paymentMethod: "card",
   });
 
-  useEffect(() => {
-    setRooms(MOCK_ROOMS);
-  }, []);
+const fetchBookings = () => {
+  fetch("http://localhost:8080/api/bookings")
+    .then(res => res.json())
+    .then(data => {
+      setAdminBookings(data);
+    })
+    .catch(err => console.error(err));
+};
+
+const deleteBooking = (id) => {
+  fetch(`http://localhost:8080/api/bookings/${id}`, {
+    method: "DELETE",
+  })
+    .then(() => {
+      fetchBookings(); // refresh list
+    })
+    .catch((err) => console.error(err));
+};
+
+useEffect(() => {
+  setRooms(MOCK_ROOMS);
+  fetchBookings();
+}, []);
 
   const handleSelectRoom = (room) => {
     setSelectedRoom(room);
@@ -315,6 +338,7 @@ const handleConfirmBooking = (guestInfo, paymentMethod) => {
     bookingReference: bookingReference,
   };
 
+
   // 1️⃣ Save booking in Spring Boot database
   fetch("http://localhost:8080/api/bookings", {
     method: "POST",
@@ -326,6 +350,7 @@ const handleConfirmBooking = (guestInfo, paymentMethod) => {
     .then((res) => res.json())
     .then((data) => {
       console.log("Booking saved:", data);
+      fetchBookings();
     })
     .catch((error) => {
       console.error("Error saving booking:", error);
@@ -426,6 +451,12 @@ Special Request: ${guestInfo.message || "None"}`;
                 e.target.style.display = "none";
               }}
             />
+            <button
+  onClick={() => setCurrentView("admin")}
+  className="bg-black text-white px-4 py-2 rounded"
+>
+  Admin
+</button>
             <span className="font-extrabold text-3xl md:text-4xl tracking-tight text-slate-600 font-serif">
               Hotel Marella Royal Inn
             </span>
@@ -476,6 +507,13 @@ Contact
             room={selectedRoom}
           />
         )}
+        {currentView === "admin" && (
+  <AdminView 
+  bookings={adminBookings} 
+  onBack={goHome} 
+  onDelete={deleteBooking}
+/>
+)}
       </main>
 
       {/* Footer */}
@@ -1420,6 +1458,50 @@ function SuccessView({ onHome, bookingDetails, room }) {
           Return to Homepage
         </button>
       </div>
+    </div>
+  );
+}
+function AdminView({ bookings, onBack, onDelete}) {
+  return (
+    <div className="p-10 max-w-6xl mx-auto">
+      <button onClick={onBack} className="mb-6 bg-gray-200 px-4 py-2 rounded">
+        ← Back
+      </button>
+
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+
+      <table className="w-full border">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Room</th>
+            <th className="p-2 border">Check-in</th>
+            <th className="p-2 border">Guests</th>
+            <th className="p-2 border">Total</th>
+            <th className="p-2 border">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {bookings.map((b, index) => (
+            <tr key={index}>
+              <td className="p-2 border">{b.guestName}</td>
+              <td className="p-2 border">{b.roomName}</td>
+              <td className="p-2 border">{b.checkIn}</td>
+              <td className="p-2 border">{b.guests}</td>
+              <td className="p-2 border">₹{b.totalPrice}</td>
+              <td className="p-2 border">
+  <button
+    onClick={() => onDelete(b.id)}
+    className="bg-red-500 text-white px-3 py-1 rounded"
+  >
+    Delete
+  </button>
+</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
