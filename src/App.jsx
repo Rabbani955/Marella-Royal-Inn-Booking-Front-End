@@ -437,9 +437,9 @@ Special Request: ${guestInfo.message || "None"}`;
     <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-[#FFC107] selection:text-slate-900">
       {/* Top Navigation Bar */}
       <nav className="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
-        <div className="relative w-full h-20 flex items-center">
+        <div className="relative w-full h-20 flex items-center justify-between">
           <div
-            className="absolute inset-y-0 left-4 sm:left-8 lg:left-12 flex items-center cursor-pointer group z-10"
+            className="flex items-center cursor-pointer group z-10 ml-4"
             onClick={goHome}
           >
             {/* Using the provided Hotel Logo here */}
@@ -451,32 +451,29 @@ Special Request: ${guestInfo.message || "None"}`;
                 e.target.style.display = "none";
               }}
             />
-            <button
-  onClick={() => setCurrentView("admin")}
-  className="bg-black text-white px-4 py-2 rounded"
->
-  Admin
-</button>
             <span className="font-extrabold text-3xl md:text-4xl tracking-tight text-slate-600 font-serif">
               Hotel Marella Royal Inn
             </span>
           </div>
+         
+ 
           {/* Right Side: Links (Kept exactly in the same place) */}
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex justify-end">
-            <div className="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
-              <a href="#rooms" className="hover:text-[#FFC107] transition-colors">
-Rooms
-</a>
+          <div className="flex items-center gap-4 mr-6">
 
-<a href="#amenities" className="hover:text-[#FFC107] transition-colors">
-Amenities
-</a>
+  <button
+    onClick={() => setCurrentView("admin")}
+    className="bg-black text-white px-4 py-2 rounded"
+  >
+    Admin
+  </button>
 
-<a href="#contact" className="hover:text-[#FFC107] transition-colors">
-Contact
-</a>
-            </div>
-          </div>
+  <div className="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
+    <a href="#rooms">Rooms</a>
+    <a href="#amenities">Amenities</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+</div>
         </div>
       </nav>
 
@@ -586,6 +583,44 @@ Contact
 >
   <Phone size={28} className="text-white" />
 </a>
+    </div>
+  );
+}
+
+function AdminView({ bookings, onBack, onDelete }) {
+  return (
+    <div className="p-6">
+      <button onClick={onBack} className="mb-4 bg-gray-500 text-white px-4 py-2 rounded">
+        Back
+      </button>
+
+      <h2 className="text-2xl font-bold mb-4">Admin Panel</h2>
+
+      <table className="w-full border">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Room</th>
+            <th>Guests</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {bookings.map((b) => (
+            <tr key={b.id}>
+              <td>{b.guestName}</td>
+              <td>{b.roomName}</td>
+              <td>{b.guests}</td>
+              <td>₹{b.totalPrice}</td>
+              <td>
+                <button onClick={() => onDelete(b.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -1458,50 +1493,6 @@ function SuccessView({ onHome, bookingDetails, room }) {
           Return to Homepage
         </button>
       </div>
-    </div>
-  );
-}
-function AdminView({ bookings, onBack, onDelete}) {
-  return (
-    <div className="p-10 max-w-6xl mx-auto">
-      <button onClick={onBack} className="mb-6 bg-gray-200 px-4 py-2 rounded">
-        ← Back
-      </button>
-
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
-      <table className="w-full border">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Room</th>
-            <th className="p-2 border">Check-in</th>
-            <th className="p-2 border">Guests</th>
-            <th className="p-2 border">Total</th>
-            <th className="p-2 border">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {bookings.map((b, index) => (
-            <tr key={index}>
-              <td className="p-2 border">{b.guestName}</td>
-              <td className="p-2 border">{b.roomName}</td>
-              <td className="p-2 border">{b.checkIn}</td>
-              <td className="p-2 border">{b.guests}</td>
-              <td className="p-2 border">₹{b.totalPrice}</td>
-              <td className="p-2 border">
-  <button
-    onClick={() => onDelete(b.id)}
-    className="bg-red-500 text-white px-3 py-1 rounded"
-  >
-    Delete
-  </button>
-</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }
