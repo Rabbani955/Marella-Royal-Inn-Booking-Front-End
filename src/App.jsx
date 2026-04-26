@@ -57,6 +57,16 @@ import bathroom2 from "./assets/Bathroom2.jpg";
 import logo from "./assets/Hotel Logo.jpg";
 import receptionVideo from "./assets/reception.mp4";
 
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 // --- MOCK DATA (Simulating Spring Boot GET /api/rooms) ---
 const MOCK_ROOMS = [
   {
@@ -1883,6 +1893,14 @@ function CheckoutView({
   const startRazorpayPayment = async () => {
     try {
       setPaymentError("");
+
+      // ✅ ADD THIS LINE (VERY IMPORTANT)
+      const isLoaded = await loadRazorpay();
+
+      if (!isLoaded) {
+        alert("Razorpay failed to load ❌");
+        return;
+      }
 
       const res = await fetch(
         "https://hotel-backend-jqdh.onrender.com/api/payment/create-order",
