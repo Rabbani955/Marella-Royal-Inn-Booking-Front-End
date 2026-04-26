@@ -59,10 +59,30 @@ import receptionVideo from "./assets/reception.mp4";
 
 const loadRazorpay = () => {
   return new Promise((resolve) => {
+    // ✅ Check if already loaded
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    // ✅ Check if script already exists
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+    );
+
+    if (existingScript) {
+      existingScript.onload = () => resolve(true);
+      return;
+    }
+
+    // ✅ Create new script only once
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
+
     document.body.appendChild(script);
   });
 };
@@ -537,11 +557,11 @@ export default function App() {
     fetchRooms();
   }, []);*/
 
- useEffect(() => {
-  if (currentView === "home") {
-    fetchRooms();
-  }
-}, [currentView]);
+  useEffect(() => {
+    if (currentView === "home") {
+      fetchRooms();
+    }
+  }, [currentView]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -1895,6 +1915,12 @@ function CheckoutView({
 
       if (!isLoaded) {
         alert("Razorpay failed to load ❌");
+        return;
+      }
+
+      // ✅ ADD HERE 👇
+      if (!window.Razorpay) {
+        alert("Razorpay not available ❌");
         return;
       }
 
