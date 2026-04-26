@@ -889,8 +889,8 @@ Special Request: ${formData.message || "None"}`;
               onCheckout={handleCheckout}
               onLogout={() => {
                 localStorage.removeItem("token");
-                //onDelete = { deleteBooking };
-                //onCheckout = { handleCheckout };
+                onDelete = { deleteBooking };
+                onCheckout = { handleCheckout };
                 setIsAdminLoggedIn(false);
                 setCurrentView("home");
               }}
