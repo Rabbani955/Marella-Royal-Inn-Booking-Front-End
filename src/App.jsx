@@ -85,7 +85,7 @@ const loadRazorpay = () => {
 
     document.body.appendChild(script);
   });
-}; 
+};
 
 // --- MOCK DATA (Simulating Spring Boot GET /api/rooms) ---
 const MOCK_ROOMS = [
@@ -605,56 +605,56 @@ export default function App() {
   };
 
   const handleConfirmBooking = async (formData, paymentMethod) => {
-  // ✅ 1. Check room availability
-  const bookedCount = occupiedRooms.filter(
-    (r) => r === selectedRoom.name
-  ).length;
+    // ✅ 1. Check room availability
+    const bookedCount = occupiedRooms.filter(
+      (r) => r === selectedRoom.name,
+    ).length;
 
-  if (selectedRoom && bookedCount >= 5) {
-    alert("All rooms are occupied ❌");
-    return;
-  }
+    if (selectedRoom && bookedCount >= 5) {
+      alert("All rooms are occupied ❌");
+      return;
+    }
 
-  // ✅ 2. Prevent double submit
-  if (isSubmitting) return;
+    // ✅ 2. Prevent double submit
+    if (isSubmitting) return;
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  try {
-    // ✅ 3. Generate booking reference
-    const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
+    try {
+      // ✅ 3. Generate booking reference
+      const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
 
-    // ✅ 4. Update booking details (UI state)
-    const updatedDetails = {
-      ...bookingDetails,
-      bookingReference,
-      paymentMethod:
-        paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
-    };
+      // ✅ 4. Update booking details (UI state)
+      const updatedDetails = {
+        ...bookingDetails,
+        bookingReference,
+        paymentMethod:
+          paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
+      };
 
-    setBookingDetails(updatedDetails);
+      setBookingDetails(updatedDetails);
 
-    // ✅ 5. Prepare data for backend
-    const bookingData = {
-      guestName: formData.guestName,
-      email: formData.email,
-      phone: formData.phone,
-      roomName: selectedRoom?.name,
-      guests: updatedDetails.guests,
-      checkIn: updatedDetails.checkIn,
-      checkOut: updatedDetails.checkOut,
-      totalPrice: updatedDetails.total,
-      paymentMethod:
-        paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
+      // ✅ 5. Prepare data for backend
+      const bookingData = {
+        guestName: formData.guestName,
+        email: formData.email,
+        phone: formData.phone,
+        roomName: selectedRoom?.name,
+        guests: updatedDetails.guests,
+        checkIn: updatedDetails.checkIn,
+        checkOut: updatedDetails.checkOut,
+        totalPrice: updatedDetails.total,
+        paymentMethod:
+          paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
 
-      // ✅ IMPORTANT: store payment ID if available
-      paymentId: formData.paymentId || "N/A",
+        // ✅ IMPORTANT: store payment ID if available
+        paymentId: formData.paymentId || "N/A",
 
-      bookingReference: bookingReference,
-    };
+        bookingReference: bookingReference,
+      };
 
-    // ✅ 6. WhatsApp message
-    const messageDetails = `*New Booking Request!*
+      // ✅ 6. WhatsApp message
+      const messageDetails = `*New Booking Request!*
 
 Booking Reference: ${bookingReference}
 
@@ -672,96 +672,94 @@ Payment: ${bookingData.paymentMethod}
 
 Special Request: ${formData.message || "None"}`;
 
-    const HOTEL_PHONE =
-      import.meta.env.VITE_HOTEL_PHONE || "917780423648";
+      const HOTEL_PHONE = import.meta.env.VITE_HOTEL_PHONE || "917780423648";
 
-    const whatsappUrl = `https://wa.me/${HOTEL_PHONE}?text=${encodeURIComponent(
-      messageDetails
-    )}`;
+      const whatsappUrl = `https://wa.me/${HOTEL_PHONE}?text=${encodeURIComponent(
+        messageDetails,
+      )}`;
 
-    // ✅ 7. Email data
-    const templateParams = {
-      booking_reference: bookingReference,
-      guest_name: formData.guestName,
-      guest_email: formData.email,
-      guest_phone: formData.phone,
-      room_name: selectedRoom?.name,
-      guests: updatedDetails.guests,
-      check_in: updatedDetails.checkIn,
-      check_out: updatedDetails.checkOut,
-      total: updatedDetails.total,
-      payment_method: bookingData.paymentMethod,
-      special_request: formData.message || "None",
-    };
+      // ✅ 7. Email data
+      const templateParams = {
+        booking_reference: bookingReference,
+        guest_name: formData.guestName,
+        guest_email: formData.email,
+        guest_phone: formData.phone,
+        room_name: selectedRoom?.name,
+        guests: updatedDetails.guests,
+        check_in: updatedDetails.checkIn,
+        check_out: updatedDetails.checkOut,
+        total: updatedDetails.total,
+        payment_method: bookingData.paymentMethod,
+        special_request: formData.message || "None",
+      };
 
-    // =========================================
-    // 🔥 MAIN FIX: HANDLE BOTH PAYMENT TYPES
-    // =========================================
+      // =========================================
+      // 🔥 MAIN FIX: HANDLE BOTH PAYMENT TYPES
+      // =========================================
 
-    if (paymentMethod === "hotel" || paymentMethod === "card") {
-
-      // ✅ 8. Save booking in backend
-      const res = await fetch(
-        "https://hotel-backend-jqdh.onrender.com/api/bookings",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      if (paymentMethod === "hotel" || paymentMethod === "card") {
+        // ✅ 8. Save booking in backend
+        const res = await fetch(
+          "https://hotel-backend-jqdh.onrender.com/api/bookings",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bookingData),
           },
-          body: JSON.stringify(bookingData),
+        );
+
+        if (!res.ok) {
+          throw new Error("Booking failed");
         }
-      );
 
-      if (!res.ok) {
-        throw new Error("Booking failed");
+        console.log("✅ Booking saved successfully");
+
+        // ✅ 9. Open WhatsApp (NON-BLOCKING)
+        setTimeout(() => {
+          window.open(whatsappUrl, "_blank");
+        }, 500);
+
+        // ✅ 10. Send emails (background)
+        fetch("https://api.emailjs.com/api/v1.0/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            service_id: "service_79vxn5l",
+            template_id: "template_hj48bne",
+            user_id: "n94jEJBXkDeCf_eH4",
+            template_params: templateParams,
+          }),
+        }).catch(() => {});
+
+        fetch("https://api.emailjs.com/api/v1.0/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            service_id: "service_79vxn5l",
+            template_id: "template_lf1532q",
+            user_id: "n94jEJBXkDeCf_eH4",
+            template_params: {
+              ...templateParams,
+              to_email: formData.email,
+            },
+          }),
+        }).catch(() => {});
+
+        // ✅ 11. Redirect to success page
+        setCurrentView("success");
+
+        return;
       }
-
-      console.log("✅ Booking saved successfully");
-
-      // ✅ 9. Open WhatsApp (NON-BLOCKING)
-      setTimeout(() => {
-        window.open(whatsappUrl, "_blank");
-      }, 500);
-
-      // ✅ 10. Send emails (background)
-      fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: "service_79vxn5l",
-          template_id: "template_hj48bne",
-          user_id: "n94jEJBXkDeCf_eH4",
-          template_params: templateParams,
-        }),
-      }).catch(() => {});
-
-      fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: "service_79vxn5l",
-          template_id: "template_lf1532q",
-          user_id: "n94jEJBXkDeCf_eH4",
-          template_params: {
-            ...templateParams,
-            to_email: formData.email,
-          },
-        }),
-      }).catch(() => {});
-
-      // ✅ 11. Redirect to success page
-      setCurrentView("success");
-
-      return;
+    } catch (err) {
+      console.error("❌ Booking Error:", err);
+      alert("Booking failed ❌");
+    } finally {
+      // ✅ 12. Always reset loading state
+      setIsSubmitting(false);
     }
-  } catch (err) {
-    console.error("❌ Booking Error:", err);
-    alert("Booking failed ❌");
-  } finally {
-    // ✅ 12. Always reset loading state
-    setIsSubmitting(false);
-  }
-};
+  };
 
   const goHome = () => {
     setCurrentView("home");
@@ -889,8 +887,8 @@ Special Request: ${formData.message || "None"}`;
               onCheckout={handleCheckout}
               onLogout={() => {
                 localStorage.removeItem("token");
-                onDelete = { deleteBooking };
-                onCheckout = { handleCheckout };
+                //onDelete = { deleteBooking };
+                //onCheckout = { handleCheckout };
                 setIsAdminLoggedIn(false);
                 setCurrentView("home");
               }}
@@ -1062,6 +1060,7 @@ Special Request: ${formData.message || "None"}`;
 
 function AdminView({ bookings, rooms, onBack, onDelete, onCheckout }) {
   const [search, setSearch] = React.useState("");
+  const [deleteId, setDeleteId] = useState(null);
 
   const filteredBookings = (bookings || []).filter((b) =>
     (b.guestName || "").toLowerCase().includes(search.toLowerCase()),
@@ -1178,11 +1177,7 @@ function AdminView({ bookings, rooms, onBack, onDelete, onCheckout }) {
 
                 <td className="p-3">
                   <button
-                    onClick={() => {
-                      if (window.confirm("Delete this booking?")) {
-                        onDelete(b.id);
-                      }
-                    }}
+                    onClick={() => setDeleteId(b.id)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
                     Delete
@@ -1209,6 +1204,32 @@ function AdminView({ bookings, rooms, onBack, onDelete, onCheckout }) {
           </tbody>
         </table>
       </div>
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-[300px] text-center">
+            <h2 className="text-lg font-bold mb-4">Delete this booking?</h2>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  onDelete(deleteId);
+                  setDeleteId(null);
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Yes
+              </button>
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
