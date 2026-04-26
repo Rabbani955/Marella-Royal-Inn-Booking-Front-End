@@ -537,15 +537,11 @@ export default function App() {
     fetchRooms();
   }, []);*/
 
-  useEffect(() => {
+ useEffect(() => {
+  if (currentView === "home") {
     fetchRooms();
-  }, []);
-
-  useEffect(() => {
-    if (currentView === "home") {
-      fetchRooms(); // 🔥 refresh when returning to home
-    }
-  }, [currentView]);
+  }
+}, [currentView]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
