@@ -57,7 +57,7 @@ import bathroom2 from "./assets/Bathroom2.jpg";
 import logo from "./assets/Hotel Logo.jpg";
 import receptionVideo from "./assets/reception.mp4";
 
-/*const loadRazorpay = () => {
+const loadRazorpay = () => {
   return new Promise((resolve) => {
     // ✅ Check if already loaded
     if (window.Razorpay) {
@@ -85,7 +85,7 @@ import receptionVideo from "./assets/reception.mp4";
 
     document.body.appendChild(script);
   });
-}; */
+}; 
 
 // --- MOCK DATA (Simulating Spring Boot GET /api/rooms) ---
 const MOCK_ROOMS = [
