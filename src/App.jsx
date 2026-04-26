@@ -605,29 +605,36 @@ export default function App() {
   };
 
   const handleConfirmBooking = async (formData, paymentMethod) => {
-    const bookedCount = occupiedRooms.filter(
-      (r) => r === selectedRoom.name,
-    ).length;
+  // ✅ 1. Check room availability
+  const bookedCount = occupiedRooms.filter(
+    (r) => r === selectedRoom.name
+  ).length;
 
-    if (selectedRoom && bookedCount >= 5) {
-      alert("All rooms are occupied ❌");
-      return;
-    }
+  if (selectedRoom && bookedCount >= 5) {
+    alert("All rooms are occupied ❌");
+    return;
+  }
 
-    if (isSubmitting) return;
+  // ✅ 2. Prevent double submit
+  if (isSubmitting) return;
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
+  try {
+    // ✅ 3. Generate booking reference
     const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
 
+    // ✅ 4. Update booking details (UI state)
     const updatedDetails = {
       ...bookingDetails,
       bookingReference,
-      paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card",
+      paymentMethod:
+        paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
     };
 
     setBookingDetails(updatedDetails);
 
+    // ✅ 5. Prepare data for backend
     const bookingData = {
       guestName: formData.guestName,
       email: formData.email,
@@ -637,11 +644,16 @@ export default function App() {
       checkIn: updatedDetails.checkIn,
       checkOut: updatedDetails.checkOut,
       totalPrice: updatedDetails.total,
-      paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card",
+      paymentMethod:
+        paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
+
+      // ✅ IMPORTANT: store payment ID if available
+      paymentId: formData.paymentId || "N/A",
+
       bookingReference: bookingReference,
     };
 
-    // ✅ WhatsApp message
+    // ✅ 6. WhatsApp message
     const messageDetails = `*New Booking Request!*
 
 Booking Reference: ${bookingReference}
@@ -660,11 +672,14 @@ Payment: ${bookingData.paymentMethod}
 
 Special Request: ${formData.message || "None"}`;
 
-    //const HOTEL_PHONE = "917780423648";
-    const HOTEL_PHONE = import.meta.env.VITE_HOTEL_PHONE || "917780423648";
-    const whatsappUrl = `https://wa.me/${HOTEL_PHONE}?text=${encodeURIComponent(messageDetails)}`;
+    const HOTEL_PHONE =
+      import.meta.env.VITE_HOTEL_PHONE || "917780423648";
 
-    // ✅ EMAIL DATA
+    const whatsappUrl = `https://wa.me/${HOTEL_PHONE}?text=${encodeURIComponent(
+      messageDetails
+    )}`;
+
+    // ✅ 7. Email data
     const templateParams = {
       booking_reference: bookingReference,
       guest_name: formData.guestName,
@@ -679,73 +694,74 @@ Special Request: ${formData.message || "None"}`;
       special_request: formData.message || "None",
     };
 
-    // =========================
-    // 🔥 PAYMENT FLOW CONTROL
-    // =========================
+    // =========================================
+    // 🔥 MAIN FIX: HANDLE BOTH PAYMENT TYPES
+    // =========================================
 
-    try {
-      console.log("Payment Method:", paymentMethod);
+    if (paymentMethod === "hotel" || paymentMethod === "card") {
 
-      // ✅ FORCE Pay-at-Hotel flow (temporary fix)
-      if (paymentMethod === "hotel") {
-        // ✅ 1. Save booking in DB
-        const res = await fetch(
-          "https://hotel-backend-jqdh.onrender.com/api/bookings",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bookingData),
+      // ✅ 8. Save booking in backend
+      const res = await fetch(
+        "https://hotel-backend-jqdh.onrender.com/api/bookings",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-
-        if (!res.ok) {
-          throw new Error("Booking failed");
+          body: JSON.stringify(bookingData),
         }
+      );
 
-        // WhatsApp
-        window.open(whatsappUrl, "_blank");
-
-        // Background emails
-        fetch("https://api.emailjs.com/api/v1.0/email/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            service_id: "service_79vxn5l",
-            template_id: "template_hj48bne",
-            user_id: "n94jEJBXkDeCf_eH4",
-            template_params: templateParams,
-          }),
-        }).catch(() => {});
-
-        fetch("https://api.emailjs.com/api/v1.0/email/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            service_id: "service_79vxn5l",
-            template_id: "template_lf1532q",
-            user_id: "n94jEJBXkDeCf_eH4",
-            template_params: {
-              ...templateParams,
-              to_email: formData.email,
-            },
-          }),
-        }).catch(() => {});
-
-        // ✅ CRITICAL FIX
-        setIsSubmitting(false); // force reset BEFORE navigation
-        setCurrentView("success");
-
-        return;
+      if (!res.ok) {
+        throw new Error("Booking failed");
       }
-    } catch (err) {
-      console.error(err);
-      alert("Booking failed ❌");
-    } finally {
-      setIsSubmitting(false); // 🔥 ALWAYS RUNS
+
+      console.log("✅ Booking saved successfully");
+
+      // ✅ 9. Open WhatsApp (NON-BLOCKING)
+      setTimeout(() => {
+        window.open(whatsappUrl, "_blank");
+      }, 500);
+
+      // ✅ 10. Send emails (background)
+      fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: "service_79vxn5l",
+          template_id: "template_hj48bne",
+          user_id: "n94jEJBXkDeCf_eH4",
+          template_params: templateParams,
+        }),
+      }).catch(() => {});
+
+      fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: "service_79vxn5l",
+          template_id: "template_lf1532q",
+          user_id: "n94jEJBXkDeCf_eH4",
+          template_params: {
+            ...templateParams,
+            to_email: formData.email,
+          },
+        }),
+      }).catch(() => {});
+
+      // ✅ 11. Redirect to success page
+      setCurrentView("success");
+
+      return;
     }
-  };
+  } catch (err) {
+    console.error("❌ Booking Error:", err);
+    alert("Booking failed ❌");
+  } finally {
+    // ✅ 12. Always reset loading state
+    setIsSubmitting(false);
+  }
+};
 
   const goHome = () => {
     setCurrentView("home");
