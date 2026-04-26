@@ -483,7 +483,7 @@ export default function App() {
       }
 
       const data = await res.json();
-      console.log("ROOMS DATA:", data);
+      //console.log("ROOMS DATA:", data);
 
       // ✅ Merge backend + MOCK (FIXED)
       const updatedRooms = data.map((room) => {
