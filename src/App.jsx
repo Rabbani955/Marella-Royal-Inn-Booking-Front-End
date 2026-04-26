@@ -529,12 +529,6 @@ export default function App() {
 
   useEffect(() => {
     fetchRooms();
-
-    const interval = setInterval(() => {
-      fetchRooms();
-    }, 5000); // refresh every 5 sec
-
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
