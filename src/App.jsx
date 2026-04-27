@@ -610,13 +610,11 @@ export default function App() {
   };
 
   const handleConfirmBooking = async (formData, paymentMethod) => {
-    // ✅ 1. Safety check
     if (!selectedRoom) {
       alert("Room not selected ❌");
       return;
     }
 
-    // ✅ 2. Check room availability
     const bookedCount = occupiedRooms.filter(
       (r) => r === selectedRoom.name,
     ).length;
@@ -626,25 +624,20 @@ export default function App() {
       return;
     }
 
-    // ✅ 3. Prevent double submit
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      // ✅ 4. Generate booking reference
       const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
 
-      // ✅ 5. Update booking details
       const updatedDetails = {
         ...bookingDetails,
         bookingReference,
-        paymentMethod:
-          paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
+        paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card", // ✅ FIXED
       };
 
       setBookingDetails(updatedDetails);
 
-      // ✅ 6. Prepare backend data (FIXED totalPrice)
       const bookingData = {
         guestName: formData.guestName,
         email: formData.email,
@@ -653,14 +646,12 @@ export default function App() {
         guests: updatedDetails.guests,
         checkIn: updatedDetails.checkIn,
         checkOut: updatedDetails.checkOut,
-        totalPrice: Math.round(updatedDetails.total), // 🔥 FIXED
-        paymentMethod:
-          paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
-        paymentId: formData.paymentId || "N/A",
+        totalPrice: Math.round(updatedDetails.total),
+        paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card", // ✅ FIXED
+        paymentId: paymentMethod === "hotel" ? null : formData.paymentId, // ✅ FIXED
         bookingReference: bookingReference,
       };
 
-      // ✅ 7. WhatsApp message
       const messageDetails = `*New Booking Request!*
 
 Booking Reference: ${bookingReference}
@@ -685,7 +676,6 @@ Special Request: ${formData.message || "None"}`;
         messageDetails,
       )}`;
 
-      // ✅ 8. Email data
       const templateParams = {
         booking_reference: bookingReference,
         guest_name: formData.guestName,
@@ -701,40 +691,36 @@ Special Request: ${formData.message || "None"}`;
       };
 
       // =========================================
-      // 🔥 SAVE BOOKING (NON-BLOCKING)
+      // 🔥 SAVE BOOKING (STRICT)
       // =========================================
-      try {
-        const res = await fetch(
-          "https://hotel-backend-jqdh.onrender.com/api/bookings",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bookingData),
+      const res = await fetch(
+        "https://hotel-backend-jqdh.onrender.com/api/bookings",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify(bookingData),
+        },
+      );
 
-        const text = await res.text();
-        console.log("BOOKING RESPONSE:", res.status, text);
+      const text = await res.text();
+      console.log("BOOKING RESPONSE:", res.status, text);
 
-        if (!res.ok) {
-          console.error("⚠️ Booking failed but continuing...");
-        } else {
-          console.log("✅ Booking saved successfully");
-        }
-      } catch (err) {
-        console.error("⚠️ Backend error but continuing:", err);
+      if (!res.ok) {
+        throw new Error("Booking failed: " + text); // ❌ STOP FLOW
       }
 
+      console.log("✅ Booking saved successfully");
+
       // =========================================
-      // ✅ ALWAYS RUN BELOW (IMPORTANT)
+      // ✅ RUN ONLY AFTER SUCCESS
       // =========================================
 
-      // ✅ 9. Open WhatsApp (NO TIMEOUT)
+      // ✅ WhatsApp
       window.open(whatsappUrl, "_blank");
 
-      // ✅ 10. Send emails (background)
+      // ✅ Emails (background)
       fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -760,16 +746,16 @@ Special Request: ${formData.message || "None"}`;
         }),
       }).catch(() => {});
 
-      // ✅ 11. Redirect to success page
+      // ✅ Redirect
       setCurrentView("success");
     } catch (err) {
-      console.error("❌ Unexpected Error:", err);
-      alert("Something went wrong ❌");
+      console.error("❌ Error:", err);
+      alert(err.message || "Booking failed ❌");
     } finally {
       setIsSubmitting(false);
     }
-  };
-  
+  }
+
   const goHome = () => {
     setCurrentView("home");
     setSelectedRoom(null);
