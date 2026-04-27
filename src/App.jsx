@@ -754,7 +754,7 @@ Special Request: ${formData.message || "None"}`;
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   const goHome = () => {
     setCurrentView("home");
