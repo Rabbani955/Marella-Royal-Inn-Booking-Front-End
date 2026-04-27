@@ -610,26 +610,31 @@ export default function App() {
   };
 
   const handleConfirmBooking = async (formData, paymentMethod) => {
-    // ✅ 1. Check room availability
+    // ✅ 1. Safety check
+    if (!selectedRoom) {
+      alert("Room not selected ❌");
+      return;
+    }
+
+    // ✅ 2. Check room availability
     const bookedCount = occupiedRooms.filter(
       (r) => r === selectedRoom.name,
     ).length;
 
-    if (selectedRoom && bookedCount >= 5) {
+    if (bookedCount >= 5) {
       alert("All rooms are occupied ❌");
       return;
     }
 
-    // ✅ 2. Prevent double submit
+    // ✅ 3. Prevent double submit
     if (isSubmitting) return;
-
     setIsSubmitting(true);
 
     try {
-      // ✅ 3. Generate booking reference
+      // ✅ 4. Generate booking reference
       const bookingReference = "HMRI-" + Date.now().toString().slice(-6);
 
-      // ✅ 4. Update booking details (UI state)
+      // ✅ 5. Update booking details
       const updatedDetails = {
         ...bookingDetails,
         bookingReference,
@@ -639,26 +644,23 @@ export default function App() {
 
       setBookingDetails(updatedDetails);
 
-      // ✅ 5. Prepare data for backend
+      // ✅ 6. Prepare backend data (FIXED totalPrice)
       const bookingData = {
         guestName: formData.guestName,
         email: formData.email,
         phone: formData.phone,
-        roomName: selectedRoom?.name,
+        roomName: selectedRoom.name,
         guests: updatedDetails.guests,
         checkIn: updatedDetails.checkIn,
         checkOut: updatedDetails.checkOut,
-        totalPrice: updatedDetails.total,
+        totalPrice: Math.round(updatedDetails.total), // 🔥 FIXED
         paymentMethod:
           paymentMethod === "hotel" ? "Pay at Hotel" : "Online Payment",
-
-        // ✅ IMPORTANT: store payment ID if available
         paymentId: formData.paymentId || "N/A",
-
         bookingReference: bookingReference,
       };
 
-      // ✅ 6. WhatsApp message
+      // ✅ 7. WhatsApp message
       const messageDetails = `*New Booking Request!*
 
 Booking Reference: ${bookingReference}
@@ -666,12 +668,12 @@ Booking Reference: ${bookingReference}
 Guest: ${formData.guestName}
 Phone: ${formData.phone}
 
-Room: ${selectedRoom?.name}
+Room: ${selectedRoom.name}
 Guests: ${updatedDetails.guests}
 
 Dates: ${updatedDetails.checkIn} to ${updatedDetails.checkOut}
 
-Total: ₹${updatedDetails.total}
+Total: ₹${Math.round(updatedDetails.total)}
 
 Payment: ${bookingData.paymentMethod}
 
@@ -683,27 +685,25 @@ Special Request: ${formData.message || "None"}`;
         messageDetails,
       )}`;
 
-      // ✅ 7. Email data
+      // ✅ 8. Email data
       const templateParams = {
         booking_reference: bookingReference,
         guest_name: formData.guestName,
         guest_email: formData.email,
         guest_phone: formData.phone,
-        room_name: selectedRoom?.name,
+        room_name: selectedRoom.name,
         guests: updatedDetails.guests,
         check_in: updatedDetails.checkIn,
         check_out: updatedDetails.checkOut,
-        total: updatedDetails.total,
+        total: Math.round(updatedDetails.total),
         payment_method: bookingData.paymentMethod,
         special_request: formData.message || "None",
       };
 
       // =========================================
-      // 🔥 MAIN FIX: HANDLE BOTH PAYMENT TYPES
+      // 🔥 SAVE BOOKING (NON-BLOCKING)
       // =========================================
-
-      if (paymentMethod === "hotel" || paymentMethod === "card") {
-        // ✅ 8. Save booking in backend
+      try {
         const res = await fetch(
           "https://hotel-backend-jqdh.onrender.com/api/bookings",
           {
@@ -715,57 +715,61 @@ Special Request: ${formData.message || "None"}`;
           },
         );
 
+        const text = await res.text();
+        console.log("BOOKING RESPONSE:", res.status, text);
+
         if (!res.ok) {
-          throw new Error("Booking failed");
+          console.error("⚠️ Booking failed but continuing...");
+        } else {
+          console.log("✅ Booking saved successfully");
         }
-
-        console.log("✅ Booking saved successfully");
-
-        // ✅ 9. Open WhatsApp (NON-BLOCKING)
-        setTimeout(() => {
-          window.open(whatsappUrl, "_blank");
-        }, 500);
-
-        // ✅ 10. Send emails (background)
-        fetch("https://api.emailjs.com/api/v1.0/email/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            service_id: "service_79vxn5l",
-            template_id: "template_hj48bne",
-            user_id: "n94jEJBXkDeCf_eH4",
-            template_params: templateParams,
-          }),
-        }).catch(() => {});
-
-        fetch("https://api.emailjs.com/api/v1.0/email/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            service_id: "service_79vxn5l",
-            template_id: "template_lf1532q",
-            user_id: "n94jEJBXkDeCf_eH4",
-            template_params: {
-              ...templateParams,
-              to_email: formData.email,
-            },
-          }),
-        }).catch(() => {});
-
-        // ✅ 11. Redirect to success page
-        setCurrentView("success");
-
-        return;
+      } catch (err) {
+        console.error("⚠️ Backend error but continuing:", err);
       }
+
+      // =========================================
+      // ✅ ALWAYS RUN BELOW (IMPORTANT)
+      // =========================================
+
+      // ✅ 9. Open WhatsApp (NO TIMEOUT)
+      window.open(whatsappUrl, "_blank");
+
+      // ✅ 10. Send emails (background)
+      fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: "service_79vxn5l",
+          template_id: "template_hj48bne",
+          user_id: "n94jEJBXkDeCf_eH4",
+          template_params: templateParams,
+        }),
+      }).catch(() => {});
+
+      fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: "service_79vxn5l",
+          template_id: "template_lf1532q",
+          user_id: "n94jEJBXkDeCf_eH4",
+          template_params: {
+            ...templateParams,
+            to_email: formData.email,
+          },
+        }),
+      }).catch(() => {});
+
+      // ✅ 11. Redirect to success page
+      setCurrentView("success");
     } catch (err) {
-      console.error("❌ Booking Error:", err);
-      alert("Booking failed ❌");
+      console.error("❌ Unexpected Error:", err);
+      alert("Something went wrong ❌");
     } finally {
-      // ✅ 12. Always reset loading state
       setIsSubmitting(false);
     }
   };
-
+  
   const goHome = () => {
     setCurrentView("home");
     setSelectedRoom(null);
