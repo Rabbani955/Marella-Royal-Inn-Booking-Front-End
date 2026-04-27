@@ -50,6 +50,11 @@ import room5 from "./assets/Room5.png";
 import room6 from "./assets/Room6.png";
 import room7 from "./assets/Room7.png";
 import room8 from "./assets/Room8.png";
+import room9 from "./assets/Room9.png";
+import room10 from "./assets/Room10.png";
+import room11 from "./assets/Room11.png";
+
+import kit from "./assets/Kit.png";
 
 import bathroom1 from "./assets/Bathroom1.jpg";
 import bathroom2 from "./assets/Bathroom2.jpg";
@@ -92,7 +97,7 @@ const MOCK_ROOMS = [
   {
     id: 1,
     name: "Standard Room",
-    images: [room5, room4, room6, bathroom1],
+    images: [room9, room10, room11, room8, bathroom1, kit],
     description:
       "The Standard Room is designed to provide a comfortable and affordable stay for solo travelers or couples. The room features a cozy bed, modern furnishings, air conditioning, free Wi-Fi, a flat-screen TV, and a clean private bathroom with essential toiletries. It offers a peaceful environment where guests can relax after a long day of travel or work. Perfect for short stays, the Standard Room combines comfort, convenience, and value.",
     basePrice: 1100,
@@ -158,7 +163,7 @@ const MOCK_ROOMS = [
   {
     id: 2,
     name: "Deluxe Room",
-    images: [room4, room1, room2, room3, bathroom2],
+    images: [room5, room6, room7, room8, bathroom2, kit],
     description:
       "The Deluxe Room offers a more spacious and luxurious experience for guests who want extra comfort. This room includes a large comfortable bed, elegant interior design, air conditioning, high-speed Wi-Fi, a smart TV, wardrobe space, and a modern attached bathroom. Guests can enjoy additional seating space and enhanced room amenities that make their stay more relaxing and enjoyable. The Deluxe Room is ideal for couples or business travelers seeking a premium stay experience.",
     basePrice: 1400,
@@ -228,7 +233,7 @@ const MOCK_ROOMS = [
   {
     id: 3,
     name: "Family Room",
-    images: [room1, room8, room4, room2, bathroom2],
+    images: [room1, room4, room3, room2, bathroom2, kit],
     description:
       "The Family Room is specially designed for families or groups traveling together. It provides a larger living space with multiple beds to comfortably accommodate several guests. The room includes air conditioning, free Wi-Fi, a flat-screen TV, spacious seating area, wardrobe, and a fully equipped private bathroom. With its roomy layout and comfortable amenities, the Family Room ensures that families can enjoy a relaxing and memorable stay together.",
     basePrice: 1500,
