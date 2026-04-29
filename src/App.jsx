@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-//Rabbani new one updated
+
 import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import {
