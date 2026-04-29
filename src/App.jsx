@@ -1324,7 +1324,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                 (r) => r === room.name,
               ).length;
 
-              const isFull = bookedCount >= ROOM_LIMIT;
+              const isFull = bookedCount >= ROOM_LIMIT || room.soldOut;
 
               return (
                 <div
@@ -1333,15 +1333,15 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                 >
                   <div className="relative h-64 overflow-hidden bg-slate-200">
                     <div className="absolute top-4 left-4 z-10">
-                      {isFull ? (
-                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                          Occupied
-                        </span>
-                      ) : (
-                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                          Available ({ROOM_LIMIT - bookedCount} left)
-                        </span>
-                      )}
+                      <span
+                        className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
+                          room.soldOut ? "bg-red-500" : "bg-green-500"
+                        }`}
+                      >
+                        {room.soldOut
+                          ? "SOLD OUT"
+                          : `Available (${ROOM_LIMIT - bookedCount} left)`}
+                      </span>
                     </div>
                     <img
                       src={
@@ -2149,7 +2149,7 @@ function CheckoutView({
                   )}
                 </div>
               </div>
-             
+
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   Special Requests (Optional)
