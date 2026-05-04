@@ -41,6 +41,7 @@ import {
   Users,
   ChevronLeft,
   ChevronDown,
+  Metronome,
 } from "lucide-react";
 import room1 from "./assets/Room1.png";
 import room2 from "./assets/Room2.png";
@@ -61,6 +62,23 @@ import bathroom2 from "./assets/Bathroom2.jpg";
 
 import logo from "./assets/Hotel Logo.jpg";
 import receptionVideo from "./assets/reception.mp4";
+
+import rnsit from "./assets/nearby/rnsit.jpg";
+import bgs from "./assets/nearby/bgs.jpg";
+import global from "./assets/nearby/global.jpg";
+import gopalan from "./assets/nearby/gopalan.png";
+import metro from "./assets/nearby/metro.jpg";
+import forum from "./assets/nearby/forum.jpg";
+import wonderla from "./assets/nearby/wonderla.jpg";
+import cubbon from "./assets/nearby/cubbon.jpg";
+import churchstreet from "./assets/nearby/churchstreet.jpg";
+import majestic from "./assets/nearby/majestic.jpg";
+import ksrm from "./assets/nearby/ksrm.jpg";
+import lalbhag from "./assets/nearby/lalbhag.jpg";
+import soudha from "./assets/nearby/soudha.jpg";
+import ubcity from "./assets/nearby/ubcity.jpg";
+import palace from "./assets/nearby/palace.jpg";
+import kormangla from "./assets/nearby/kormangla.jpg";
 
 const loadRazorpay = () => {
   return new Promise((resolve) => {
@@ -941,6 +959,7 @@ Special Request: ${formData.message || "None"}`;
               <a
                 href="https://maps.google.com/?q=RNSIT Bangalore"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-[#FFC107]"
               >
                 33, Sai Nisargha Layout, Opp RNSIT College,
@@ -1014,6 +1033,7 @@ Special Request: ${formData.message || "None"}`;
               <a
                 href="https://www.google.com/maps"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs text-slate-400 hover:text-[#FFC107]"
               >
                 See Reviews on Google →
@@ -1239,6 +1259,139 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
     );
   }
 
+  const nearbyPlaces = [
+    {
+      name: "RNS Institute of Technology",
+      category: "Education",
+      distance: "0.2 km",
+      image: rnsit,
+      description:
+        "Reputed engineering college located just opposite the hotel.",
+    },
+    {
+      name: "Global Village Tech Park",
+      category: "Business",
+      distance: "3 km",
+      image: global,
+      description: "Major IT hub hosting top multinational companies.",
+    },
+    {
+      name: "BGS Global Hospital",
+      category: "Hospital",
+      distance: "2.5 km",
+      image: bgs,
+      description:
+        "Multi-speciality hospital with advanced healthcare services.",
+    },
+    {
+      name: "RR Nagar Metro Station",
+      category: "Transport",
+      distance: "3.5 km",
+      image: metro,
+      description: "Metro connectivity for easy travel across Bangalore.",
+    },
+    {
+      name: "Gopalan Arcade Mall",
+      category: "Mall",
+      distance: "4 km",
+      image: gopalan,
+      description: "Nearby mall with shopping, dining, and cinema.",
+    },
+    {
+      name: "Forum Mall",
+      category: "Mall",
+      distance: "12 km",
+      image: forum,
+      description: "Popular shopping destination with brands and restaurants.",
+    },
+    {
+      name: "Cubbon Park",
+      category: "Park",
+      distance: "12 km",
+      image: cubbon,
+      description: "A large green park perfect for relaxation and walking.",
+    },
+    {
+      name: "KSR Bengaluru Railway Station",
+      category: "Transport",
+      distance: "10 km",
+      image: ksrm,
+      description: "Main railway station connecting Bangalore to major cities.",
+    },
+    {
+      name: "Wonderla Amusement Park",
+      category: "Entertainment",
+      distance: "18 km",
+      image: wonderla,
+      description:
+        "Famous amusement park with water rides and thrilling attractions.",
+    },
+    {
+      name: "Lalbagh Botanical Garden",
+      category: "Park",
+      distance: "12 km",
+      image: lalbhag,
+      description:
+        "Historic botanical garden known for its greenery and glasshouse.",
+    },
+    {
+      name: "Bangalore Palace",
+      category: "Attraction",
+      distance: "10 km",
+      image: palace,
+      description:
+        "Royal palace showcasing historic architecture and heritage.",
+    },
+    {
+      name: "Majestic Bus Stand (Kempegowda Bus Station)",
+      category: "Transport",
+      distance: "10 km",
+      image: majestic,
+      description:
+        "Central bus station connecting Bangalore with major cities.",
+    },
+    {
+      name: "MG Road - Church Street",
+      category: "Entertainment",
+      distance: "12 km",
+      image: churchstreet,
+      description: "Popular street for shopping, cafes, and nightlife.",
+    },
+    {
+      name: "UB City Mall",
+      category: "Mall",
+      distance: "12 km",
+      image: ubcity,
+      description: "Luxury shopping and fine dining destination.",
+    },
+    {
+      name: "Koramangala - Pubs & Cafes",
+      category: "Entertainment",
+      distance: "12 km",
+      image: kormangla,
+      description: "Vibrant area known for pubs, cafes, and nightlife.",
+    },
+  ];
+
+  const categories = [
+    "All",
+    "Education",
+    "Business",
+    "Hospital",
+    "Transport",
+    "Mall",
+    "Park",
+    "Entertainment",
+    "Attraction",
+  ];
+
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const filteredPlaces =
+    activeCategory === "All"
+      ? nearbyPlaces
+      : nearbyPlaces.filter((p) => p.category === activeCategory);
+
   const [currentImageIndex, setCurrentImageIndex] = useState({});
 
   useEffect(() => {
@@ -1448,6 +1601,92 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+
+
+      {/* Near By places code*/}
+
+      <div
+        id="nearby"
+        className="bg-gradient-to-b from-slate-100 to-white py-20"
+      >
+        <div className="max-w-7xl mx-auto px-4">
+          {/* TITLE */}
+          <h2 className="text-4xl font-extrabold text-center mb-4">
+            Explore Nearby Places
+          </h2>
+          <p className="text-center text-slate-500 mb-10">
+            Discover attractions, shopping, and essentials around Marella Royal
+            Inn
+          </p>
+
+          {/* CATEGORY FILTER */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition 
+          ${
+            activeCategory === cat
+              ? "bg-[#FFC107] text-black shadow-md"
+              : "bg-white text-slate-600 border hover:bg-[#FFC107]/20"
+          }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPlaces.map((place, index) => (
+              <div
+                key={index}
+                className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              >
+                {/* IMAGE */}
+                <div className="relative overflow-hidden">
+                  <img
+                    src={place.image}
+                    alt={place.name}
+                    className="w-full h-52 object-cover group-hover:scale-110 transition duration-500"
+                  />
+
+                  {/* CATEGORY BADGE */}
+                  <span className="absolute top-3 left-3 bg-black/70 text-white text-xs px-3 py-1 rounded-full">
+                    {place.category}
+                  </span>
+                </div>
+
+                {/* CONTENT */}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900">
+                    {place.name}
+                  </h3>
+
+                  <p className="text-sm text-[#FFC107] font-semibold mt-1">
+                    📍 {place.distance}
+                  </p>
+
+                  <p className="text-sm text-slate-600 mt-2">
+                    {place.description}
+                  </p>
+
+                  <a
+                    href={`https://www.google.com/maps?q=${place.name}+Bangalore`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline"
+                  >
+                    Get Directions →
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
