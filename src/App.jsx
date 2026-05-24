@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 
 import AdminLogin from "./AdminLogin";
-import AdminDashboard from "./AdminDashboard";
+const AdminDashboard = lazy(() => import("./AdminDashboard"));
 import {
   Calendar,
   User,
@@ -43,42 +43,42 @@ import {
   ChevronDown,
   Metronome,
 } from "lucide-react";
-import room1 from "./assets/Room1.png";
-import room2 from "./assets/Room2.png";
-import room3 from "./assets/Room3.png";
-import room4 from "./assets/Room4.png";
-import room5 from "./assets/Room5.png";
-import room6 from "./assets/Room6.png";
-import room7 from "./assets/Room7.png";
-import room8 from "./assets/Room8.png";
-import room9 from "./assets/Room9.png";
-import room10 from "./assets/Room10.png";
-import room11 from "./assets/Room11.png";
+import room1 from "./assets/Room1.webp";
+import room2 from "./assets/Room2.webp";
+import room3 from "./assets/Room3.webp";
+import room4 from "./assets/Room4.webp";
+import room5 from "./assets/Room5.webp";
+import room6 from "./assets/Room6.webp";
+import room7 from "./assets/Room7.webp";
+import room8 from "./assets/Room8.webp";
+import room9 from "./assets/Room9.webp";
+import room10 from "./assets/Room10.webp";
+import room11 from "./assets/Room11.webp";
 
-import kit from "./assets/Kit.png";
+import kit from "./assets/Kit.webp";
 
-import bathroom1 from "./assets/Bathroom1.jpg";
-import bathroom2 from "./assets/Bathroom2.jpg";
+import bathroom1 from "./assets/Bathroom1.webp";
+import bathroom2 from "./assets/Bathroom2.webp";
 
 import logo from "./assets/Hotel Logo.jpg";
 import receptionVideo from "./assets/reception.mp4";
 
-import rnsit from "./assets/nearby/rnsit.jpg";
-import bgs from "./assets/nearby/bgs.jpg";
-import global from "./assets/nearby/global.jpg";
-import gopalan from "./assets/nearby/gopalan.png";
-import metro from "./assets/nearby/metro.jpg";
-import forum from "./assets/nearby/forum.jpg";
-import wonderla from "./assets/nearby/wonderla.jpg";
-import cubbon from "./assets/nearby/cubbon.jpg";
-import churchstreet from "./assets/nearby/churchstreet.jpg";
-import majestic from "./assets/nearby/majestic.jpg";
-import ksrm from "./assets/nearby/ksrm.jpg";
-import lalbhag from "./assets/nearby/lalbhag.jpg";
-import soudha from "./assets/nearby/soudha.jpg";
-import ubcity from "./assets/nearby/ubcity.jpg";
-import palace from "./assets/nearby/palace.jpg";
-import kormangla from "./assets/nearby/kormangla.jpg";
+import rnsit from "./assets/nearby/rnsit.webp";
+import bgs from "./assets/nearby/bgs.webp";
+import global from "./assets/nearby/global.webp";
+import gopalan from "./assets/nearby/gopalan.webp";
+import metro from "./assets/nearby/metro.webp";
+import forum from "./assets/nearby/forum.webp";
+import wonderla from "./assets/nearby/wonderla.webp";
+import cubbon from "./assets/nearby/cubbon.webp";
+import churchstreet from "./assets/nearby/churchstreet.webp";
+import majestic from "./assets/nearby/majestic.webp";
+import ksrm from "./assets/nearby/ksrm.webp";
+import lalbhag from "./assets/nearby/lalbhag.webp";
+import soudha from "./assets/nearby/soudha.webp";
+import ubcity from "./assets/nearby/ubcity.webp";
+import palace from "./assets/nearby/palace.webp";
+import kormangla from "./assets/nearby/kormangla.webp";
 
 const loadRazorpay = () => {
   return new Promise((resolve) => {
@@ -361,33 +361,6 @@ export default function App() {
     paymentMethod: "card",
   });
 
-  /*const fetchBookings = () => {
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/api/bookings/admin", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          console.error("❌ API ERROR:", res.status, text);
-          throw new Error("Failed to fetch bookings");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("📦 DATA RECEIVED:", data);
-        setAdminBookings(data);
-      })
-      .catch((err) => {
-        console.error("❌ Fetch Failed:", err);
-        setAdminBookings([]);
-      });
-  }; */
-
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -553,29 +526,6 @@ export default function App() {
       setRooms(MOCK_ROOMS);
     }
   };
-
-  /*useEffect(() => {
-    fetchRooms();
-
-    // ✅ Refresh rooms every 5 seconds (PRICE UPDATE FIX)
-    const roomInterval = setInterval(() => {
-      fetchRooms();
-    }, 5000);
-
-    // ✅ Existing occupied rooms refresh
-    const occupiedInterval = setInterval(() => {
-      fetchOccupiedRooms();
-    }, 5000);
-
-    return () => {
-      clearInterval(roomInterval);
-      clearInterval(occupiedInterval);
-    };
-  }, []); */
-
-  /*useEffect(() => {
-    fetchRooms();
-  }, []);*/
 
   useEffect(() => {
     if (currentView === "home") {
@@ -813,20 +763,6 @@ Special Request: ${formData.message || "None"}`;
 
           {/* Right Side: Links (Kept exactly in the same place) */}
           <div className="flex items-center gap-4 mr-6">
-            {/*  <button
-              onClick={() => {
-                const token = localStorage.getItem("token");
-
-                if (token && token !== "null" && token !== "undefined") {
-                  fetchBookings();
-                  setIsAdminLoggedIn(true);
-                  setCurrentView("admin_dashboard");
-                } else {
-                  setCurrentView("admin_login");
-                }
-              }}
-              className="bg-black text-white px-4 py-2 rounded"
-            > */}
             <button
               onClick={() => {
                 setCurrentView("admin_login"); // 🔥 ALWAYS GO TO LOGIN FIRST
@@ -890,19 +826,19 @@ Special Request: ${formData.message || "None"}`;
 
         {currentView === "admin_dashboard" &&
           (isAdminLoggedIn ? (
-            <AdminDashboard
-              bookings={adminBookings}
-              refreshRooms={fetchRooms}
-              onDelete={deleteBooking}
-              onCheckout={handleCheckout}
-              onLogout={() => {
-                localStorage.removeItem("token");
-                //onDelete = { deleteBooking };
-                //onCheckout = { handleCheckout };
-                setIsAdminLoggedIn(false);
-                setCurrentView("home");
-              }}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <AdminDashboard
+                bookings={adminBookings}
+                refreshRooms={fetchRooms}
+                onDelete={deleteBooking}
+                onCheckout={handleCheckout}
+                onLogout={() => {
+                  localStorage.removeItem("token");
+                  setIsAdminLoggedIn(false);
+                  setCurrentView("home");
+                }}
+              />
+            </Suspense>
           ) : (
             <AdminLogin
               onLogin={() => {
@@ -1417,7 +1353,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
 
         return updated;
       });
-    }, 3000); // change image every 3 seconds
+    }, 6000); // change image every 3 seconds
 
     return () => clearInterval(interval);
   }, [rooms]);
@@ -1430,6 +1366,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
           loop
           muted
           playsInline
+          preload="none"
           className="absolute inset-0 w-full h-full object-cover"
           onError={(e) => {
             e.target.style.display = "none";
@@ -1500,6 +1437,10 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                           : "https://via.placeholder.com/400"
                       }
                       alt={room.name}
+                      width="800"
+                      height="500"
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         if (e.target.src.includes("placeholder.com")) return;
                         e.target.onerror = null;
@@ -1588,7 +1529,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                     className="group bg-slate-50 hover:bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center cursor-pointer hover:-translate-y-1"
                   >
                     {/* Icon */}
-                    <div className="text-[#FFC107] mb-3 flex justify-center group-hover:scale-110 group-hover:drop-shadow-lg transition-all">
+                    <div className="text-[#FFC107] mb-3 flex justify-center group-hover:scale-105 group-hover:drop-shadow-lg transition-all">
                       {amenity.icon}
                     </div>
 
@@ -1603,8 +1544,6 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
           ))}
         </div>
       </div>
-
-
 
       {/* Near By places code*/}
 
@@ -1652,7 +1591,11 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                   <img
                     src={place.image}
                     alt={place.name}
-                    className="w-full h-52 object-cover group-hover:scale-110 transition duration-500"
+                    width="800"
+                    height="500"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-52 object-cover group-hover:scale-105 transition duration-500"
                   />
 
                   {/* CATEGORY BADGE */}
@@ -1700,11 +1643,6 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
             className="w-full h-full border-0"
             loading="lazy"
           ></iframe>
-          {/* <iframe
-            src="https://www.google.com/maps?q=Hotel%20Marella%20Royal%20Suites20Bangalore&output=embed"
-            className="w-full h-full border-0"
-            loading="lazy"
-          ></iframe> */}
         </div>
       </div>
     </div>
@@ -1823,6 +1761,10 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
                   : "https://via.placeholder.com/400"
               }
               alt={room.name}
+              width="800"
+              height="500"
+              loading="lazy"
+              decoding="async"
               onError={(e) => {
                 if (e.target.src.includes("placeholder.com")) return;
                 e.target.onerror = null;
@@ -2521,6 +2463,8 @@ function CheckoutView({
                       : "https://via.placeholder.com/400"
                   }
                   alt={room.name}
+                  width="800"
+                  height="500"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "https://via.placeholder.com/400";
