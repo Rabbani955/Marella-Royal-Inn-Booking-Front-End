@@ -3,41 +3,65 @@
 
 <head>
   <meta charset="UTF-8" />
-   <link rel="icon" type="image/png" sizes="52x52" href="/icon2.png" />
+
+  <!-- Website Icon -->
+  <link rel="icon" type="image/png" sizes="52x52" href="/icon2.png" />
+
+  <!-- Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- SEO -->
   <title>Marella Royal Inn | Luxury Rooms & Comfort Living</title>
 
-  <!-- ✅ SEO Structured Data (VERY IMPORTANT FOR GOOGLE) -->
+  <meta
+    name="description"
+    content="Book luxury and affordable rooms at Marella Royal Inn, Bangalore. Comfortable stay near RNSIT College with premium amenities."
+  />
+
+  <meta
+    name="keywords"
+    content="Hotel in Bangalore, Marella Royal Inn, Luxury Rooms, Budget Hotel, RNSIT Hotel, Bangalore Stay"
+  />
+
+  <meta name="author" content="RabbaniTech Solution Pvt Ltd" />
+
+  <!-- Open Graph SEO -->
+  <meta property="og:title" content="Marella Royal Inn" />
+  <meta
+    property="og:description"
+    content="Luxury and affordable stay near RNSIT College Bangalore."
+  />
+  <meta property="og:type" content="website" />
+
+  <!-- Structured Data -->
   <script type="application/ld+json">
   {
-   "@context": "https://schema.org",
-   "@type": "Hotel",
-   "name": "Marella Royal Inn",
-   "address": {
-     "@type": "PostalAddress",
-     "streetAddress": "33, 4th Cross Rd, opposite RNSIT College, 5th Stage, Rajarajeshwari Nagar",
-     "addressLocality": "Bengaluru",
-     "addressRegion": "Karnataka",
-     "postalCode": "560098",
-     "addressCountry": "India"
-   },
-   "telephone": "+917795951743",
-   "url": "https://yourdomain.com",
-   "priceRange": "₹1200-₹2000"
+    "@context": "https://schema.org",
+    "@type": "Hotel",
+    "name": "Marella Royal Inn",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "33, 4th Cross Rd, opposite RNSIT College, 5th Stage, Rajarajeshwari Nagar",
+      "addressLocality": "Bengaluru",
+      "addressRegion": "Karnataka",
+      "postalCode": "560098",
+      "addressCountry": "India"
+    },
+    "telephone": "+917795951743",
+    "priceRange": "₹1200-₹2000",
+    "url": "https://yourdomain.com"
   }
   </script>
-
-  <!-- Razorpay Payment Gateway 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>  -->
-
 </head>
 
 <body>
+
+  <!-- React Root -->
   <div id="root"></div>
 
-  <!-- React App Entry -->
+  <!-- Vite Development Entry -->
   <script type="module" src="/src/main.jsx"></script>
+
 </body>
 
 </html>
