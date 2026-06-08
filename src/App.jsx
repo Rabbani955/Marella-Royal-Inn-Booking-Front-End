@@ -1492,19 +1492,31 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
             </h2>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <input
-                type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-                className="border rounded-lg p-3"
-              />
+              <div className="mb-4">
+                <label className="block mb-2 font-semibold text-slate-700">
+                  Check In
+                </label>
 
-              <input
-                type="date"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-                className="border rounded-lg p-3"
-              />
+                <input
+                  type="date"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 font-semibold text-slate-700">
+                  Check Out
+                </label>
+
+                <input
+                  type="date"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
 
               <button
                 onClick={checkAvailability}
