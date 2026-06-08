@@ -746,7 +746,7 @@ Special Request: ${formData.message || "None"}`;
     <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-[#FFC107] selection:text-slate-900">
       {/* Top Navigation Bar */}
       <nav className="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
-        <div className="relative w-full h-20 flex items-center justify-between">
+        <div className="relative w-full h-20 flex items-center justify-between px-2">
           <div
             className="flex items-center cursor-pointer group z-10 ml-4"
             onClick={goHome}
@@ -755,12 +755,12 @@ Special Request: ${formData.message || "None"}`;
             <img
               src={logo}
               alt="Hotel Marella Royal Inn Logo"
-              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mr-4"
+              className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform mr-2"
               onError={(e) => {
                 e.target.style.display = "none";
               }}
             />
-            <span className="font-extrabold text-1xl md:text-1xl tracking-tight text-slate-600 font-serif">
+            <span className="font-extrabold text-xl md:text-3xl tracking-tight text-slate-600 font-serif text-center flex-1 px-2">
               Hotel Marella Royal Inn
             </span>
           </div>
@@ -786,7 +786,7 @@ Special Request: ${formData.message || "None"}`;
 
             {/* Mobile Hamburger */}
             <button
-              className="md:hidden text-3xl font-bold"
+              className="md:hidden text-4xl font-bold px-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               ☰
