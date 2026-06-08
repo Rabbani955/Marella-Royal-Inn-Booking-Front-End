@@ -760,7 +760,7 @@ Special Request: ${formData.message || "None"}`;
                 e.target.style.display = "none";
               }}
             />
-            <span className="font-extrabold text-xl md:text-xl tracking-tight text-slate-600 font-serif text-center flex-1 px-2">
+            <span className="font-extrabold text-xl md:text-2xl tracking-tight text-slate-600 font-serif text-center flex-1 px-2">
               Hotel Marella Royal Inn
             </span>
           </div>
