@@ -350,6 +350,7 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [adminBookings, setAdminBookings] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [bookingDetails, setBookingDetails] = useState({
     checkIn: "",
     checkOut: "",
@@ -792,33 +793,33 @@ Special Request: ${formData.message || "None"}`;
             </button>
           </div>
         </div>
-      </nav>
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg border-t">
-          <div className="flex flex-col p-4 space-y-4 text-slate-700 font-semibold">
-            <button
-              onClick={() => {
-                setCurrentView("admin_login");
-                setMobileMenuOpen(false);
-              }}
-            >
-              Admin
-            </button>
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg border-t">
+            <div className="flex flex-col p-4 space-y-4 text-slate-700 font-semibold">
+              <button
+                onClick={() => {
+                  setCurrentView("admin_login");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Admin
+              </button>
 
-            <a href="#rooms" onClick={() => setMobileMenuOpen(false)}>
-              Rooms
-            </a>
+              <a href="#rooms" onClick={() => setMobileMenuOpen(false)}>
+                Rooms
+              </a>
 
-            <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
-              Amenities
-            </a>
+              <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
+                Amenities
+              </a>
 
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
-              Contact
-            </a>
+              <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
+                Contact
+              </a>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
 
       {/* Main Content Area */}
       <main className="pb-20">
@@ -1232,13 +1233,6 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
   const [availableRooms, setAvailableRooms] = useState([]);
 
   const ROOM_LIMIT = 5;
-  if (!rooms.length) {
-    return (
-      <div className="text-center p-20 text-lg font-semibold">
-        Loading rooms...
-      </div>
-    );
-  }
 
   const nearbyPlaces = [
     {
@@ -1398,10 +1392,18 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
 
         return updated;
       });
-    }, 6000); // change image every 3 seconds
+    }, 6000); // change image every 6 seconds
 
     return () => clearInterval(interval);
   }, [rooms]);
+
+  if (!rooms.length) {
+    return (
+      <div className="text-center p-20 text-lg font-semibold">
+        Loading rooms...
+      </div>
+    );
+  }
 
   const checkAvailability = async () => {
     if (!checkIn || !checkOut) {
@@ -1420,9 +1422,9 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
 
       console.log("AVAILABLE ROOMS:", data);
 
-      if (data.length === 0) {
-        alert("No rooms available for selected dates");
+      if (!Array.isArray(data)) {
         setAvailableRooms([]);
+        alert("Invalid response from server");
         return;
       }
 
@@ -1967,7 +1969,7 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
               Amenities
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
-              {room.amenities.map((amenity, index) => (
+              {room.amenities?.map((amenity, index) => (
                 <div
                   key={index}
                   className="flex items-center text-slate-700 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100"
