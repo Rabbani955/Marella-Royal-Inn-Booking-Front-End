@@ -10,6 +10,8 @@ export default function AdminDashboard({
   const [editingPrice, setEditingPrice] = useState({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState({});
+  const [endDate, setEndDate] = useState({});
 
   const fetchRooms = async () => {
     setLoading(true);
@@ -20,7 +22,7 @@ export default function AdminDashboard({
         "https://hotel-backend-jqdh.onrender.com/api/rooms/admin",
         {
           headers: { Authorization: "Bearer " + token },
-        }
+        },
       );
 
       const data = await res.json();
@@ -49,7 +51,7 @@ export default function AdminDashboard({
         {
           method: "PUT",
           headers: { Authorization: "Bearer " + token },
-        }
+        },
       );
 
       toast.success("Price updated");
@@ -69,12 +71,45 @@ export default function AdminDashboard({
         {
           method: "PUT",
           headers: { Authorization: "Bearer " + token },
-        }
+        },
       );
 
       fetchRooms();
     } catch {
       toast.error("Error updating");
+    }
+  };
+
+  const holdRoomDates = async (roomId) => {
+    if (!startDate[roomId] || !endDate[roomId]) {
+      toast.error("Please select Start Date and End Date");
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+
+      await fetch(
+        "https://hotel-backend-jqdh.onrender.com/api/rooms/admin/date-soldout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+            startDate: startDate[roomId],
+            endDate: endDate[roomId],
+            soldOut: true,
+          }),
+        },
+      );
+
+      toast.success("Room blocked successfully");
+      fetchRooms();
+      refreshRooms();
+    } catch {
+      toast.error("Failed to block room");
     }
   };
 
@@ -86,23 +121,29 @@ export default function AdminDashboard({
       {
         method: "PUT",
         headers: { Authorization: "Bearer " + token },
-      }
+      },
     );
 
     fetchRooms();
     refreshRooms();
+    setStartDate({
+      ...startDate,
+      [roomId]: "",
+    });
+
+    setEndDate({
+      ...endDate,
+      [roomId]: "",
+    });
   };
 
   const deleteBooking = async (id) => {
     const token = localStorage.getItem("token");
 
-    await fetch(
-      `https://hotel-backend-jqdh.onrender.com/api/bookings/${id}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: "Bearer " + token },
-      }
-    );
+    await fetch(`https://hotel-backend-jqdh.onrender.com/api/bookings/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: "Bearer " + token },
+    });
 
     fetchRooms();
     refreshRooms();
@@ -194,9 +235,7 @@ export default function AdminDashboard({
               <input
                 type="number"
                 value={editingPrice[room.id] ?? room.basePrice}
-                onChange={(e) =>
-                  handlePriceChange(room.id, e.target.value)
-                }
+                onChange={(e) => handlePriceChange(room.id, e.target.value)}
                 className="mt-3 w-full p-2 border rounded"
               />
 
@@ -208,21 +247,47 @@ export default function AdminDashboard({
               </button>
 
               <button
-                onClick={() =>
-                  toggleSoldOut(room.id, room.soldOut)
-                }
+                onClick={() => toggleSoldOut(room.id, room.soldOut)}
                 className="mt-2 w-full bg-gray-800 hover:bg-black text-white py-2 rounded"
               >
                 Toggle Availability
+              </button>
+              <input
+                type="date"
+                value={startDate[room.id] || ""}
+                onChange={(e) =>
+                  setStartDate({
+                    ...startDate,
+                    [room.id]: e.target.value,
+                  })
+                }
+                className="mt-3 w-full p-2 border rounded"
+              />
+
+              <input
+                type="date"
+                value={endDate[room.id] || ""}
+                onChange={(e) =>
+                  setEndDate({
+                    ...endDate,
+                    [room.id]: e.target.value,
+                  })
+                }
+                className="mt-2 w-full p-2 border rounded"
+              />
+
+              <button
+                onClick={() => holdRoomDates(room.id)}
+                className="mt-2 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded"
+              >
+                Hold Selected Dates
               </button>
             </div>
           ))}
         </div>
 
         {/* BOOKINGS */}
-        <h2 className="text-2xl font-bold mb-5 text-yellow-600">
-          Bookings
-        </h2>
+        <h2 className="text-2xl font-bold mb-5 text-yellow-600">Bookings</h2>
 
         <input
           type="text"
@@ -247,9 +312,7 @@ export default function AdminDashboard({
             <tbody>
               {bookings
                 .filter((b) =>
-                  b.guestName
-                    .toLowerCase()
-                    .includes(search.toLowerCase())
+                  b.guestName.toLowerCase().includes(search.toLowerCase()),
                 )
                 .map((b) => (
                   <tr key={b.id} className="border-b">
@@ -258,9 +321,7 @@ export default function AdminDashboard({
                     <td className="p-3">
                       {b.checkIn} → {b.checkOut}
                     </td>
-                    <td className="p-3 font-bold">
-                      ₹{b.totalPrice}
-                    </td>
+                    <td className="p-3 font-bold">₹{b.totalPrice}</td>
 
                     <td className="p-3">
                       <span className="px-3 py-1 rounded bg-green-100">
