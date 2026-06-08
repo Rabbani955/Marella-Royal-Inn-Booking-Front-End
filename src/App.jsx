@@ -349,6 +349,7 @@ export default function App() {
   const [occupiedRooms, setOccupiedRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [adminBookings, setAdminBookings] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
     checkIn: "",
     checkOut: "",
@@ -530,6 +531,7 @@ export default function App() {
   useEffect(() => {
     if (currentView === "home") {
       fetchRooms();
+      fetchOccupiedRooms(); // ✅ ADD THIS LINE
     }
   }, [currentView]);
 
@@ -580,9 +582,9 @@ export default function App() {
       return;
     }
 
-    const bookedCount = occupiedRooms.filter(
-      (r) => r === selectedRoom.name,
-    ).length;
+    const bookedCount = occupiedRooms
+      .filter((r) => r.roomName === selectedRoom.name)
+      .reduce((sum, r) => sum + (r.roomsCount || 1), 0);
 
     if (bookedCount >= 5) {
       alert("All rooms are occupied ❌");
@@ -615,6 +617,7 @@ export default function App() {
         paymentMethod: paymentMethod === "hotel" ? "Pay at Hotel" : "Card", // ✅ FIXED
         paymentId: paymentMethod === "hotel" ? null : formData.paymentId, // ✅ FIXED
         bookingReference: bookingReference,
+        roomsCount: updatedDetails.roomsCount,
       };
 
       const messageDetails = `*New Booking Request!*
@@ -763,22 +766,59 @@ Special Request: ${formData.message || "None"}`;
 
           {/* Right Side: Links (Kept exactly in the same place) */}
           <div className="flex items-center gap-4 mr-6">
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+              <button
+                onClick={() => {
+                  setCurrentView("admin_login");
+                }}
+              >
+                Admin
+              </button>
+
+              <a href="#rooms">Rooms</a>
+
+              <a href="#amenities">Amenities</a>
+
+              <a href="#contact">Contact</a>
+            </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              className="md:hidden text-3xl font-bold"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+      </nav>
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white shadow-lg border-t">
+          <div className="flex flex-col p-4 space-y-4 text-slate-700 font-semibold">
             <button
               onClick={() => {
-                setCurrentView("admin_login"); // 🔥 ALWAYS GO TO LOGIN FIRST
+                setCurrentView("admin_login");
+                setMobileMenuOpen(false);
               }}
             >
               Admin
             </button>
 
-            <div className="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
-              <a href="#rooms">Rooms</a>
-              <a href="#amenities">Amenities</a>
-              <a href="#contact">Contact</a>
-            </div>
+            <a href="#rooms" onClick={() => setMobileMenuOpen(false)}>
+              Rooms
+            </a>
+
+            <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
+              Amenities
+            </a>
+
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
+              Contact
+            </a>
           </div>
         </div>
-      </nav>
+      )}
 
       {/* Main Content Area */}
       <main className="pb-20">
@@ -1186,6 +1226,11 @@ function AdminView({ bookings, rooms, onBack, onDelete, onCheckout }) {
 // 1. HOME PAGE COMPONENT
 // ==========================================
 function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [availableRooms, setAvailableRooms] = useState([]);
+
   const ROOM_LIMIT = 5;
   if (!rooms.length) {
     return (
@@ -1357,6 +1402,53 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
 
     return () => clearInterval(interval);
   }, [rooms]);
+
+  const checkAvailability = async () => {
+    if (!checkIn || !checkOut) {
+      alert("Please select Check-In and Check-Out dates");
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+
+      const res = await fetch(
+        `https://hotel-backend-jqdh.onrender.com/api/rooms/available?checkIn=${checkIn}&checkOut=${checkOut}`,
+      );
+
+      const data = await res.json();
+
+      console.log("AVAILABLE ROOMS:", data);
+
+      if (data.length === 0) {
+        alert("No rooms available for selected dates");
+        setAvailableRooms([]);
+        return;
+      }
+
+      // ✅ Merge backend room data with frontend room data
+      const mergedRooms = data.map((room) => {
+        const fullRoom = rooms.find(
+          (r) => r.name?.toLowerCase() === room.name?.toLowerCase(),
+        );
+
+        return {
+          ...fullRoom,
+          ...room,
+        };
+      });
+
+      setAvailableRooms(mergedRooms);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to check availability");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const roomsToShow = availableRooms.length > 0 ? availableRooms : rooms;
+
   return (
     <div className="animate-in fade-in duration-500 bg-white">
       {/* Hero Banner with Video */}
@@ -1388,6 +1480,52 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
         </div>
       </div>
 
+      {/* Availability Search */}
+
+      <div className="bg-white py-10 shadow-md">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white rounded-2xl border p-6 shadow">
+            <h2 className="text-2xl font-bold text-center mb-6">
+              Check Room Availability
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <input
+                type="date"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
+                className="border rounded-lg p-3"
+              />
+
+              <input
+                type="date"
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
+                className="border rounded-lg p-3"
+              />
+
+              <button
+                onClick={checkAvailability}
+                disabled={isSearching}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold"
+              >
+                {isSearching ? "Checking..." : "Check Availability"}
+              </button>
+              <button
+                onClick={() => {
+                  setAvailableRooms([]);
+                  setCheckIn("");
+                  setCheckOut("");
+                }}
+                className="bg-gray-500 text-white rounded-lg font-bold p-3"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Room Listing */}
       <div
         id="rooms"
@@ -1405,11 +1543,11 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {Array.isArray(rooms) &&
-            rooms.map((room) => {
-              const bookedCount = occupiedRooms.filter(
-                (r) => r === room.name,
-              ).length;
+          {Array.isArray(roomsToShow) &&
+            roomsToShow.map((room) => {
+              const bookedCount = occupiedRooms
+                .filter((r) => r.roomName === room.name)
+                .reduce((sum, r) => sum + (r.roomsCount || 1), 0);
 
               const isFull = bookedCount >= ROOM_LIMIT || room.soldOut;
 
@@ -1711,6 +1849,11 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
       return;
     }
 
+    if (roomsCount > availableRooms) {
+      setError(`Only ${availableRooms} rooms available.`);
+      return;
+    }
+
     onProceed({ checkIn, checkOut, guests, roomsCount }, finalTotal);
   };
 
@@ -1736,7 +1879,9 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
   // ✅ DATE
   const today = new Date().toISOString().split("T")[0];
 
-  const bookedCount = occupiedRooms.filter((r) => r === room.name).length;
+  const bookedCount = occupiedRooms
+    .filter((r) => r.roomName === room.name)
+    .reduce((sum, r) => sum + (r.roomsCount || 1), 0);
 
   const availableRooms = 5 - bookedCount;
 
@@ -1887,7 +2032,9 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
                 </span>
 
                 <button
-                  onClick={() => setRoomsCount(roomsCount + 1)}
+                  onClick={() =>
+                    setRoomsCount(Math.min(availableRooms, roomsCount + 1))
+                  }
                   className="text-xl font-bold px-3 py-1 rounded-lg hover:bg-slate-100"
                 >
                   +
@@ -1895,7 +2042,7 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
               </div>
 
               <p className="text-xs text-slate-500 mt-2 ml-1">
-                Select number of rooms required
+                Maximum available rooms: {availableRooms}
               </p>
             </div>
             <div>
