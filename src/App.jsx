@@ -1400,7 +1400,16 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
   if (!rooms.length) {
     return (
       <div className="text-center p-20 text-lg font-semibold">
-        Loading rooms...
+        ⚠️ Website Notice**
+
+Due to exceptionally high website traffic, our server is currently experiencing slower response times.
+
+Please wait a few seconds—the website will open shortly.
+
+Our developers are actively working to resolve this issue and restore normal performance.
+
+We sincerely apologize for the inconvenience and appreciate your patience and understanding.
+Loading rooms... Wait..
       </div>
     );
   }
