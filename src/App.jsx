@@ -1402,7 +1402,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
       <div className="text-center p-20 text-lg font-semibold">
       ⚠️ Please Wait ⚠️ 
 
-Due to high website traffic, the website may take **5–10 seconds** to load.
+Due to high website traffic, the website may take <b>5–10 seconds</b> to load.
 
 Please do not refresh or close the page. The website will open automatically.
 
