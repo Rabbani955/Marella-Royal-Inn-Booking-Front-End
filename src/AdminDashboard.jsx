@@ -113,7 +113,7 @@ export default function AdminDashboard({
     }
   };
 
-  const handleCheckout = async (id) => {
+ const handleCheckout = async (id, roomId) => {
     const token = localStorage.getItem("token");
 
     await fetch(
