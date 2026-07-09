@@ -691,65 +691,65 @@ Special Request: ${formData.message || "None"}`;
       // =========================================
 
       // ✅ WhatsApp
-    console.log("STEP 5 - Opening WhatsApp");
+   // =========================================
+// BOOKING SUCCESS
+// =========================================
 
-const popup = window.open(whatsappUrl, "_blank");
+// TEST
+alert("SUCCESS PAGE WILL OPEN");
+setCurrentView("success");
+return;
 
-if (!popup) {
-  console.log("WhatsApp popup blocked");
-}
+// ✅ Refresh occupied rooms
+fetchOccupiedRooms();
 
-      // ✅ Emails (background)
-      const hotelEmail = await fetch(
-        "https://api.emailjs.com/api/v1.0/email/send",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            service_id: "service_79vxn5l",
-            template_id: "template_hj48bne",
-            user_id: "n94jEJBXkDeCf_eH4",
-            template_params: templateParams,
-          }),
-        },
-      );
+// ✅ Open WhatsApp after success page
+setTimeout(() => {
+  window.open(whatsappUrl, "_blank");
+}, 500);
 
-      console.log("Hotel Email Status:", hotelEmail.status);
-      console.log(await hotelEmail.text());
+// ✅ Send hotel email (background)
+fetch("https://api.emailjs.com/api/v1.0/email/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    service_id: "service_79vxn5l",
+    template_id: "template_hj48bne",
+    user_id: "n94jEJBXkDeCf_eH4",
+    template_params: templateParams,
+  }),
+})
+.then((res) => console.log("Hotel Email:", res.status))
+.catch((err) => console.error("Hotel Email Error:", err));
 
-      const guestEmail = await fetch(
-  "https://api.emailjs.com/api/v1.0/email/send",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+// ✅ Send guest email (background)
+fetch("https://api.emailjs.com/api/v1.0/email/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    service_id: "service_79vxn5l",
+    template_id: "template_lf1532q",
+    user_id: "n94jEJBXkDeCf_eH4",
+    template_params: {
+      ...templateParams,
+      to_email: formData.email,
     },
-    body: JSON.stringify({
-      service_id: "service_79vxn5l",
-      template_id: "template_lf1532q",
-      user_id: "n94jEJBXkDeCf_eH4",
-      template_params: {
-        ...templateParams,
-        to_email: formData.email,
-      },
-    }),
-  }
-);
-
-console.log("Guest Email Status:", guestEmail.status);
-console.log(await guestEmail.text());
-
-      // ✅ Redirect
-      setCurrentView("success");
-    } catch (err) {
+  }),
+})
+.then((res) => console.log("Guest Email:", res.status))
+.catch((err) => console.error("Guest Email Error:", err));
+ } catch (err) {
       console.error("❌ Error:", err);
       alert(err.message || "Booking failed ❌");
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   const goHome = () => {
     setCurrentView("home");
