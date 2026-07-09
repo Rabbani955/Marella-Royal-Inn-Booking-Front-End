@@ -683,17 +683,21 @@ Special Request: ${formData.message || "None"}`;
       }
 
       console.log("✅ Booking saved successfully");
+      console.log("STEP 4 - Booking saved successfully");
+
 
       // =========================================
       // ✅ RUN ONLY AFTER SUCCESS
       // =========================================
 
       // ✅ WhatsApp
-      const popup = window.open(whatsappUrl, "_blank");
+    console.log("STEP 5 - Opening WhatsApp");
 
-      if (!popup) {
-        console.log("WhatsApp popup blocked");
-      }
+const popup = window.open(whatsappUrl, "_blank");
+
+if (!popup) {
+  console.log("WhatsApp popup blocked");
+}
 
       // ✅ Emails (background)
       const hotelEmail = await fetch(
