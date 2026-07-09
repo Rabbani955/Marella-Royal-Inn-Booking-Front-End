@@ -1,5 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
-
+import { Helmet } from "react-helmet-async";
+import WelcomePopup from "./WelcomePopup";
+import MyBooking from "./MyBooking";
 import AdminLogin from "./AdminLogin";
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 import {
@@ -687,33 +689,53 @@ Special Request: ${formData.message || "None"}`;
       // =========================================
 
       // ✅ WhatsApp
-      window.open(whatsappUrl, "_blank");
+      const popup = window.open(whatsappUrl, "_blank");
+
+      if (!popup) {
+        console.log("WhatsApp popup blocked");
+      }
 
       // ✅ Emails (background)
-      fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: "service_79vxn5l",
-          template_id: "template_hj48bne",
-          user_id: "n94jEJBXkDeCf_eH4",
-          template_params: templateParams,
-        }),
-      }).catch(() => {});
-
-      fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: "service_79vxn5l",
-          template_id: "template_lf1532q",
-          user_id: "n94jEJBXkDeCf_eH4",
-          template_params: {
-            ...templateParams,
-            to_email: formData.email,
+      const hotelEmail = await fetch(
+        "https://api.emailjs.com/api/v1.0/email/send",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      }).catch(() => {});
+          body: JSON.stringify({
+            service_id: "service_79vxn5l",
+            template_id: "template_hj48bne",
+            user_id: "n94jEJBXkDeCf_eH4",
+            template_params: templateParams,
+          }),
+        },
+      );
+
+      console.log("Hotel Email Status:", hotelEmail.status);
+      console.log(await hotelEmail.text());
+
+      const guestEmail = await fetch(
+  "https://api.emailjs.com/api/v1.0/email/send",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      service_id: "service_79vxn5l",
+      template_id: "template_lf1532q",
+      user_id: "n94jEJBXkDeCf_eH4",
+      template_params: {
+        ...templateParams,
+        to_email: formData.email,
+      },
+    }),
+  }
+);
+
+console.log("Guest Email Status:", guestEmail.status);
+console.log(await guestEmail.text());
 
       // ✅ Redirect
       setCurrentView("success");
@@ -743,307 +765,333 @@ Special Request: ${formData.message || "None"}`;
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-[#FFC107] selection:text-slate-900">
-      {/* Top Navigation Bar */}
-      <nav className="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
-        <div className="relative w-full h-20 flex items-center justify-between px-2">
-          <div
-            className="flex items-center cursor-pointer group z-10 ml-4"
-            onClick={goHome}
-          >
-            {/* Using the provided Hotel Logo here */}
-            <img
-              src={logo}
-              alt="Hotel Marella Royal Inn Logo"
-              className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform mr-2"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
-            <span className="font-extrabold text-xl md:text-2xl tracking-tight text-slate-600 font-serif text-center flex-1 px-2">
-              Hotel Marella Royal Inn
-            </span>
-          </div>
+    <>
+      <WelcomePopup />
 
-          {/* Right Side: Links (Kept exactly in the same place) */}
-          <div className="flex items-center gap-4 mr-6">
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
-              <button
-                onClick={() => {
-                  setCurrentView("admin_login");
-                }}
-              >
-                Admin
-              </button>
-
-              <a href="#rooms">Rooms</a>
-
-              <a href="#amenities">Amenities</a>
-
-              <a href="#contact">Contact</a>
-            </div>
-
-            {/* Mobile Hamburger */}
-            <button
-              className="md:hidden text-4xl font-bold px-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-[#FFC107] selection:text-slate-900">
+        {/* Top Navigation Bar */}
+        <nav className="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
+          <div className="relative w-full h-20 flex items-center justify-between px-2">
+            <div
+              className="flex items-center cursor-pointer group z-10 ml-4"
+              onClick={goHome}
             >
-              ☰
-            </button>
-          </div>
-        </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white shadow-lg border-t">
-            <div className="flex flex-col p-4 space-y-4 text-slate-700 font-semibold">
-              <button
-                onClick={() => {
-                  setCurrentView("admin_login");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                Admin
-              </button>
-
-              <a href="#rooms" onClick={() => setMobileMenuOpen(false)}>
-                Rooms
-              </a>
-
-              <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
-                Amenities
-              </a>
-
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
-                Contact
-              </a>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Main Content Area */}
-      <main className="pb-20">
-        {currentView === "home" && (
-          <HomeView
-            rooms={rooms}
-            occupiedRooms={occupiedRooms}
-            onSelectRoom={handleSelectRoom}
-          />
-        )}
-        {currentView === "room_details" && (
-          <RoomDetailsView
-            room={selectedRoom}
-            occupiedRooms={occupiedRooms} // ✅ ADD THIS
-            onBack={() => setCurrentView("home")}
-            onProceed={handleProceedToCheckout}
-          />
-        )}
-        {currentView === "checkout" && (
-          <CheckoutView
-            room={selectedRoom}
-            bookingDetails={bookingDetails}
-            onBack={() => setCurrentView("room_details")}
-            onSubmit={handleConfirmBooking}
-            isSubmitting={isSubmitting}
-          />
-        )}
-        {currentView === "success" && (
-          <SuccessView
-            onHome={goHome}
-            bookingDetails={bookingDetails}
-            room={selectedRoom}
-          />
-        )}
-        {currentView === "admin_login" && (
-          <AdminLogin
-            onLogin={() => {
-              setIsAdminLoggedIn(true);
-              fetchBookings(); // 🔥 ADD THIS
-
-              setCurrentView("admin_dashboard");
-            }}
-          />
-        )}
-
-        {currentView === "admin_dashboard" &&
-          (isAdminLoggedIn ? (
-            <Suspense fallback={<div>Loading...</div>}>
-              <AdminDashboard
-                bookings={adminBookings}
-                refreshRooms={fetchRooms}
-                onDelete={deleteBooking}
-                onCheckout={handleCheckout}
-                onLogout={() => {
-                  localStorage.removeItem("token");
-                  setIsAdminLoggedIn(false);
-                  setCurrentView("home");
-                }}
-              />
-            </Suspense>
-          ) : (
-            <AdminLogin
-              onLogin={() => {
-                setIsAdminLoggedIn(true);
-                fetchBookings();
-                setCurrentView("admin_dashboard");
-              }}
-            />
-          ))}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 pt-14 pb-8 border-t-4 border-[#FFC107]">
-        {/* GRID */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Column 1 - Logo & About */}
-          <div>
-            <div className="bg-white inline-block p-2 rounded-xl mb-4">
+              {/* Using the provided Hotel Logo here */}
               <img
                 src={logo}
                 alt="Hotel Marella Royal Inn Logo"
-                className="h-16 object-contain"
+                className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform mr-2"
                 onError={(e) => {
-                  e.target.parentElement.style.display = "none";
+                  e.target.style.display = "none";
                 }}
               />
+              <span className="font-extrabold text-xl md:text-2xl tracking-tight text-slate-600 font-serif text-center flex-1 px-2">
+                Hotel Marella Royal Inn
+              </span>
             </div>
 
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Experience luxury, comfort, and premium hospitality at Marella
-              Royal Inn. Book your stay with ease and confidence.
-            </p>
+            {/* Right Side: Links (Kept exactly in the same place) */}
+            <div className="flex items-center gap-4 mr-6">
+              {/* Desktop Menu */}
+              <div className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+                <button
+                  onClick={() => {
+                    setCurrentView("admin_login");
+                  }}
+                >
+                  Admin
+                </button>
 
-            {/* Social Icons */}
-            <div className="flex gap-4 mt-5">
-              <a href="#" className="hover:text-[#FFC107] text-lg">
-                📸
-              </a>
-              <a href="#" className="hover:text-[#FFC107] text-lg">
-                👍
-              </a>
-              <a href="#" className="hover:text-[#FFC107] text-lg">
-                🐦
-              </a>
-            </div>
-          </div>
+                <button onClick={() => setCurrentView("my_booking")}>
+                  My Booking
+                </button>
 
-          {/* Column 2 - Contact */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-4">Contact</h3>
+                <a href="#rooms">Rooms</a>
 
-            <p className="text-sm mb-3 flex items-start">
-              <MapPin size={16} className="mr-2 text-[#FFC107] mt-1" />
-              <a
-                href="https://maps.google.com/?q=RNSIT Bangalore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#FFC107]"
-              >
-                33, Sai Nisargha Layout, Opp RNSIT College,
-                <br />R R Nagar, Bangalore
-              </a>
-            </p>
+                <a href="#amenities">Amenities</a>
 
-            <p className="text-sm mb-3 flex items-center">
-              <Phone size={16} className="mr-2 text-[#FFC107]" />
-              <a href="tel:+917795951743" className="hover:text-[#FFC107]">
-                +91 7795951743
-              </a>
-            </p>
-
-            <p className="text-sm flex items-center">
-              <User size={16} className="mr-2 text-[#FFC107]" />
-              <a
-                href="mailto:info@hotelmarellaroyalinn.in"
-                className="hover:text-[#FFC107]"
-              >
-                info@hotelmarellaroyalinn.in
-              </a>
-            </p>
-          </div>
-
-          {/* Column 3 - Quick Links */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <a href="#" className="hover:text-[#FFC107]">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-[#FFC107]">
-                  Terms & Conditions
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-[#FFC107]">
-                  Cancellation Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-[#FFC107]">
-                  FAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4 - Trust / Extra */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-4">Why Choose Us</h3>
-            <ul className="text-sm space-y-3 text-slate-400">
-              <li>✔ Best Price Guarantee</li>
-              <li>✔ 24x7 Support</li>
-              <li>✔ Secure Booking</li>
-              <li>✔ Prime Location</li>
-            </ul>
-            <div className="mt-5">
-              <p className="text-sm text-slate-400 mb-2 font-semibold">
-                ⭐ 4.5 Rating on Google
-              </p>
-
-              <div className="flex items-center gap-1 text-yellow-400 text-lg">
-                ★★★★★
+                <a href="#contact">Contact</a>
               </div>
 
-              <a
-                href="https://www.google.com/maps"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-slate-400 hover:text-[#FFC107]"
+              {/* Mobile Hamburger */}
+              <button
+                className="md:hidden text-4xl font-bold px-2"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                See Reviews on Google →
-              </a>
+                ☰
+              </button>
             </div>
           </div>
-        </div>
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white shadow-lg border-t">
+              <div className="flex flex-col p-4 space-y-4 text-slate-700 font-semibold">
+                <button
+                  onClick={() => {
+                    setCurrentView("admin_login");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Admin
+                </button>
 
-        {/* DIVIDER */}
-        <div className="border-t border-slate-700 mt-10 pt-6 text-center">
-          <p className="text-sm text-slate-400 font-medium tracking-wide">
-            © {new Date().getFullYear()} All Rights Reserved —
-            <span className="text-[#FFC107] font-semibold ml-1 hover:underline cursor-pointer">
-              RabbaniTech Solution Pvt. Ltd.
-            </span>
-          </p>
+                <button
+                  onClick={() => {
+                    setCurrentView("my_booking");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  My Booking
+                </button>
 
-          <p className="text-xs text-slate-500 mt-2">
-            Designed & Developed with ❤️ by RabbaniTech
-          </p>
-        </div>
-      </footer>
+                <a href="#rooms">Rooms</a>
 
-      {/* Floating WhatsApp Button */}
-      <a
-        href="https://wa.me/917780423648"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full shadow-xl hover:scale-110 transition z-50"
-      >
-        <Phone size={28} className="text-white" />
-      </a>
-    </div>
+                <a href="#amenities">Amenities</a>
+
+                <a href="#contact">Contact</a>
+              </div>
+            </div>
+          )}
+        </nav>
+
+        {/* Main Content Area */}
+        <main className="pb-20">
+          {currentView === "home" && (
+            <HomeView
+              rooms={rooms}
+              occupiedRooms={occupiedRooms}
+              onSelectRoom={handleSelectRoom}
+            />
+          )}
+          {currentView === "room_details" && (
+            <RoomDetailsView
+              room={selectedRoom}
+              occupiedRooms={occupiedRooms} // ✅ ADD THIS
+              onBack={() => setCurrentView("home")}
+              onProceed={handleProceedToCheckout}
+            />
+          )}
+          {currentView === "checkout" && (
+            <CheckoutView
+              room={selectedRoom}
+              bookingDetails={bookingDetails}
+              onBack={() => setCurrentView("room_details")}
+              onSubmit={handleConfirmBooking}
+              isSubmitting={isSubmitting}
+            />
+          )}
+          {currentView === "success" && (
+            <SuccessView
+              onHome={goHome}
+              bookingDetails={bookingDetails}
+              room={selectedRoom}
+            />
+          )}
+          {currentView === "my_booking" && (
+            <MyBooking onBack={() => setCurrentView("home")} />
+          )}
+          {currentView === "admin_login" && (
+            <AdminLogin
+              onLogin={() => {
+                setIsAdminLoggedIn(true);
+                fetchBookings(); // 🔥 ADD THIS
+
+                setCurrentView("admin_dashboard");
+              }}
+            />
+          )}
+
+          {currentView === "admin_dashboard" &&
+            (isAdminLoggedIn ? (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AdminDashboard
+                  bookings={adminBookings}
+                  refreshRooms={fetchRooms}
+                  onDelete={deleteBooking}
+                  onCheckout={handleCheckout}
+                  onLogout={() => {
+                    localStorage.removeItem("token");
+                    setIsAdminLoggedIn(false);
+                    setCurrentView("home");
+                  }}
+                />
+              </Suspense>
+            ) : (
+              <AdminLogin
+                onLogin={() => {
+                  setIsAdminLoggedIn(true);
+                  fetchBookings();
+                  setCurrentView("admin_dashboard");
+                }}
+              />
+            ))}
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-slate-900 text-slate-300 pt-14 pb-8 border-t-4 border-[#FFC107]">
+          {/* GRID */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
+            {/* Column 1 - Logo & About */}
+            <div>
+              <div className="bg-white inline-block p-2 rounded-xl mb-4">
+                <img
+                  src={logo}
+                  alt="Hotel Marella Royal Inn Logo"
+                  className="h-16 object-contain"
+                  onError={(e) => {
+                    e.target.parentElement.style.display = "none";
+                  }}
+                />
+              </div>
+
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Experience luxury, comfort, and premium hospitality at Marella
+                Royal Inn. Book your stay with ease and confidence.
+              </p>
+
+              {/* Social Icons */}
+              <div className="flex gap-4 mt-5">
+                <a href="#" className="hover:text-[#FFC107] text-lg">
+                  📸
+                </a>
+                <a href="#" className="hover:text-[#FFC107] text-lg">
+                  👍
+                </a>
+                <a href="#" className="hover:text-[#FFC107] text-lg">
+                  🐦
+                </a>
+              </div>
+            </div>
+
+            {/* Column 2 - Contact */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">Contact</h3>
+
+              <p className="text-sm mb-3 flex items-start">
+                <MapPin size={16} className="mr-2 text-[#FFC107] mt-1" />
+                <a
+                  href="https://maps.google.com/?q=RNSIT Bangalore"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#FFC107]"
+                >
+                  33, Sai Nisargha Layout, Opp RNSIT College,
+                  <br />R R Nagar, Bangalore
+                </a>
+              </p>
+
+              <p className="text-sm mb-3 flex items-center">
+                <Phone size={16} className="mr-2 text-[#FFC107]" />
+                <a href="tel:+917795951743" className="hover:text-[#FFC107]">
+                  +91 7795951743
+                </a>
+              </p>
+
+              <p className="text-sm flex items-center">
+                <User size={16} className="mr-2 text-[#FFC107]" />
+                <a
+                  href="mailto:info@hotelmarellaroyalinn.in"
+                  className="hover:text-[#FFC107]"
+                >
+                  info@hotelmarellaroyalinn.in
+                </a>
+              </p>
+            </div>
+
+            {/* Column 3 - Quick Links */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <a href="#" className="hover:text-[#FFC107]">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-[#FFC107]">
+                    Terms & Conditions
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-[#FFC107]">
+                    Cancellation Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-[#FFC107]">
+                    FAQ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4 - Trust / Extra */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">
+                Why Choose Us
+              </h3>
+              <ul className="text-sm space-y-3 text-slate-400">
+                <li>✔ Best Price Guarantee</li>
+                <li>✔ 24x7 Support</li>
+                <li>✔ Secure Booking</li>
+                <li>✔ Prime Location</li>
+              </ul>
+              <div className="mt-5">
+                <p className="text-sm text-slate-400 mb-2 font-semibold">
+                  ⭐ 4.5 Rating on Google
+                </p>
+
+                <div className="flex items-center gap-1 text-yellow-400 text-lg">
+                  ★★★★★
+                </div>
+
+                <a
+                  href="https://www.google.com/maps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-slate-400 hover:text-[#FFC107]"
+                >
+                  See Reviews on Google →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Website Visitor Counter */}
+          <div className="border-t border-slate-700 mt-10 pt-6 flex justify-center">
+            <div className="bg-slate-800 px-6 py-3 rounded-xl shadow-lg border border-slate-600">
+              <img
+                src="https://api.visitorbadge.io/api/visitors?path=hotelmarellaroyalinn.in&label=👥%20Website%20Visitors&countColor=%23FFC107&labelColor=%23374151"
+                alt="Website Visitors"
+              />
+            </div>
+          </div>
+
+          {/* DIVIDER */}
+          <div className="border-t border-slate-700 mt-10 pt-6 text-center">
+            <p className="text-sm text-slate-400 font-medium tracking-wide">
+              © {new Date().getFullYear()} All Rights Reserved —
+              <span className="text-[#FFC107] font-semibold ml-1 hover:underline cursor-pointer">
+                RabbaniTech Solution Pvt. Ltd.
+              </span>
+            </p>
+
+            <p className="text-xs text-slate-500 mt-2">
+              Designed & Developed with ❤️ by RabbaniTech
+            </p>
+          </div>
+        </footer>
+
+        {/* Floating WhatsApp Button */}
+        <a
+          href="https://wa.me/917780423648"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full shadow-xl hover:scale-110 transition z-50"
+        >
+          <Phone size={28} className="text-white" />
+        </a>
+      </div>
+    </>
   );
 }
 
@@ -1400,15 +1448,10 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
   if (!rooms.length) {
     return (
       <div className="text-center p-20 text-lg font-semibold">
-      ⚠️ Please Wait ⚠️ 
-
-Due to high website traffic, the website may take <b>5–10 seconds</b> to load.
-
-Please do not refresh or close the page. The website will open automatically.
-
-Thank you for your patience.
-
-Loading rooms...
+        ⚠️ Please Wait ⚠️ Due to high website traffic, the website may take{" "}
+        <b>5–10 seconds</b> to load. Please do not refresh or close the page.
+        The website will open automatically. Thank you for your patience.
+        Loading rooms...
       </div>
     );
   }
@@ -1460,352 +1503,430 @@ Loading rooms...
   const roomsToShow = availableRooms.length > 0 ? availableRooms : rooms;
 
   return (
-    <div className="animate-in fade-in duration-500 bg-white">
-      {/* Hero Banner with Video */}
-      <div className="relative h-[65vh] bg-black flex items-center justify-center border-b-8 border-[#FFC107] overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={(e) => {
-            e.target.style.display = "none";
-          }}
-        >
-          <source src={receptionVideo || ""} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative z-10 text-center px-4 max-w-4xl mt-12">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 drop-shadow-2xl tracking-tight">
-            Welcome to <span className="text-[#FFC107]">Marella</span> Royal Inn
-          </h1>
+    <>
+      <Helmet>
+        <title>
+          Hotel Marella Royal Inn | Best Hotel in RR Nagar, Bangalore
+        </title>
 
-          <p className="text-xl md:text-2xl text-slate-100 mb-10 drop-shadow-lg font-medium">
-            Experience comfort, elegance, and premium hospitality at Marella
-            Royal Inn — book your perfect stay in just a few clicks.
-          </p>
+        <meta
+          name="description"
+          content="Hotel Marella Royal Inn offers Deluxe, Family and Standard Rooms with Free WiFi, AC, Secure Booking near RNSIT, RR Nagar, Bangalore."
+        />
+
+        <meta
+          name="keywords"
+          content="Hotel Marella Royal Inn, Hotel Bangalore, RR Nagar Hotel, Hotel near RNSIT, Deluxe Room Bangalore, Family Room Bangalore"
+        />
+
+        <meta name="author" content="Hotel Marella Royal Inn" />
+
+        <meta name="robots" content="index, follow" />
+
+        <link rel="canonical" href="https://hotelmarellaroyalinn.in" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Hotel Marella Royal Inn" />
+        <meta
+          property="og:description"
+          content="Luxury Hotel in RR Nagar, Bangalore. Book Direct & Save More."
+        />
+        <meta
+          property="og:image"
+          content="https://hotelmarellaroyalinn.in/logo.jpg"
+        />
+        <meta property="og:url" content="https://hotelmarellaroyalinn.in" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <meta name="twitter:title" content="Hotel Marella Royal Inn" />
+
+        <meta
+          name="twitter:description"
+          content="Luxury Hotel in RR Nagar, Bangalore."
+        />
+
+        <meta
+          name="twitter:image"
+          content="https://hotelmarellaroyalinn.in/logo.jpg"
+        />
+
+        {/* Hotel Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Hotel",
+            name: "Hotel Marella Royal Inn",
+            url: "https://hotelmarellaroyalinn.in",
+            image: "https://hotelmarellaroyalinn.in/logo.jpg",
+            telephone: "+91-7795951743",
+            email: "info@hotelmarellaroyalinn.in",
+            priceRange: "₹1100-₹2500",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "33, Sai Nisargha Layout, Opp RNSIT",
+              addressLocality: "Bengaluru",
+              addressRegion: "Karnataka",
+              postalCode: "560098",
+              addressCountry: "IN",
+            },
+          })}
+        </script>
+      </Helmet>
+
+      <div className="animate-in fade-in duration-500 bg-white">
+        {/* Hero Banner with Video */}
+        <div className="relative h-[65vh] bg-black flex items-center justify-center border-b-8 border-[#FFC107] overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="none"
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
+          >
+            <source src={receptionVideo || ""} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="relative z-10 text-center px-4 max-w-4xl mt-12">
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 drop-shadow-2xl tracking-tight">
+              Welcome to <span className="text-[#FFC107]">Marella</span> Royal
+              Inn
+            </h1>
+
+            <p className="text-xl md:text-2xl text-slate-100 mb-10 drop-shadow-lg font-medium">
+              Experience comfort, elegance, and premium hospitality at Marella
+              Royal Inn — book your perfect stay in just a few clicks.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Availability Search */}
+        {/* Availability Search */}
 
-      <div className="bg-white py-10 shadow-md">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white rounded-2xl border p-6 shadow">
-            <h2 className="text-2xl font-bold text-center mb-6">
-              Check Room Availability
-            </h2>
+        <div className="bg-white py-10 shadow-md">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="bg-white rounded-2xl border p-6 shadow">
+              <h2 className="text-2xl font-bold text-center mb-6">
+                Check Room Availability
+              </h2>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="mb-4">
-                <label className="block mb-2 font-semibold text-slate-700">
-                  Check In
-                </label>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="mb-4">
+                  <label className="block mb-2 font-semibold text-slate-700">
+                    Check In
+                  </label>
 
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
-                />
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block mb-2 font-semibold text-slate-700">
+                    Check Out
+                  </label>
+
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                  />
+                </div>
+
+                <button
+                  onClick={checkAvailability}
+                  disabled={isSearching}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold"
+                >
+                  {isSearching ? "Checking..." : "Check Availability"}
+                </button>
+                <button
+                  onClick={() => {
+                    setAvailableRooms([]);
+                    setCheckIn("");
+                    setCheckOut("");
+                  }}
+                  className="bg-gray-500 text-white rounded-lg font-bold p-3"
+                >
+                  Reset
+                </button>
               </div>
-
-              <div className="mb-4">
-                <label className="block mb-2 font-semibold text-slate-700">
-                  Check Out
-                </label>
-
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
-                />
-              </div>
-
-              <button
-                onClick={checkAvailability}
-                disabled={isSearching}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold"
-              >
-                {isSearching ? "Checking..." : "Check Availability"}
-              </button>
-              <button
-                onClick={() => {
-                  setAvailableRooms([]);
-                  setCheckIn("");
-                  setCheckOut("");
-                }}
-                className="bg-gray-500 text-white rounded-lg font-bold p-3"
-              >
-                Reset
-              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Room Listing */}
-      <div
-        id="rooms"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-slate-200"
-      >
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-            Our Exclusive Rooms
-          </h2>
-          <div className="w-24 h-1.5 bg-[#FFC107] mx-auto rounded-full mb-6"></div>
-          <p className="text-slate-600 max-w-2xl mx-auto text-lg font-medium">
-            Select from our range of beautifully appointed rooms and suites,
-            designed to provide the ultimate comfort.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {Array.isArray(roomsToShow) &&
-            roomsToShow.map((room) => {
-              const bookedCount = occupiedRooms
-                .filter((r) => r.roomName === room.name)
-                .reduce((sum, r) => sum + (r.roomsCount || 1), 0);
-
-              const isFull = bookedCount >= ROOM_LIMIT || room.soldOut;
-
-              return (
-                <div
-                  key={room.id}
-                  className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
-                >
-                  <div className="relative h-64 overflow-hidden bg-slate-200">
-                    <div className="absolute top-4 left-4 z-10">
-                      <span
-                        className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
-                          room.soldOut ? "bg-red-500" : "bg-green-500"
-                        }`}
-                      >
-                        {room.soldOut
-                          ? "SOLD OUT"
-                          : `Available (${ROOM_LIMIT - bookedCount} left)`}
-                      </span>
-                    </div>
-                    <img
-                      src={
-                        Array.isArray(room.images) && room.images.length > 0
-                          ? room.images?.[currentImageIndex?.[room.id] ?? 0]
-                          : "https://via.placeholder.com/400"
-                      }
-                      alt={room.name}
-                      width="800"
-                      height="500"
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        if (e.target.src.includes("placeholder.com")) return;
-                        e.target.onerror = null;
-                        e.target.src = "https://via.placeholder.com/400";
-                      }}
-                      className="w-full h-full object-cover"
-                    />
-
-                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center shadow-md">
-                      <Star
-                        size={16}
-                        className="text-[#FFC107] mr-1 fill-current"
-                      />
-                      <span className="text-sm font-extrabold text-slate-900">
-                        {room.rating}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-8 flex flex-col flex-grow">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                      {room.name}
-                    </h3>
-                    <p className="text-slate-600 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed font-medium">
-                      {room.description}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-100">
-                      <div>
-                        <span className="text-3xl font-black text-slate-900">
-                          ₹{room.basePrice}
-                        </span>
-                        <span className="text-slate-500 font-medium text-sm">
-                          {" "}
-                          / night
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (!room || !room.id) {
-                            alert("Room data error ❌");
-                            return;
-                          }
-                          onSelectRoom(room);
-                        }}
-                        disabled={isFull}
-                        className={`px-6 py-3 rounded-xl font-bold ${
-                          isFull
-                            ? "bg-gray-400 text-white cursor-not-allowed pointer-events-none"
-                            : "bg-[#FFC107] text-slate-900 hover:bg-yellow-400"
-                        }`}
-                      >
-                        {isFull ? "Not Available" : "Book Room"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-        </div>
-      </div>
-
-      {/* Amenities Grid matching User Image */}
-      <div id="amenities" className="bg-white py-24 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#FFC107] mb-3">
-              Amenities
+        {/* Room Listing */}
+        <div
+          id="rooms"
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-slate-200"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Our Exclusive Rooms
             </h2>
-            <p className="text-slate-500 text-lg">
-              Designed for your comfort & luxury
+            <div className="w-24 h-1.5 bg-[#FFC107] mx-auto rounded-full mb-6"></div>
+            <p className="text-slate-600 max-w-2xl mx-auto text-lg font-medium">
+              Select from our range of beautifully appointed rooms and suites,
+              designed to provide the ultimate comfort.
             </p>
           </div>
 
-          {AMENITIES_GROUPS.map((group, index) => (
-            <div key={index} className="mb-16">
-              {/* Category Title */}
-              <h3 className="text-2xl font-bold text-slate-900 mb-8 border-l-4 border-[#FFC107] pl-4">
-                {group.title}
-              </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {Array.isArray(roomsToShow) &&
+              roomsToShow.map((room) => {
+                const bookedCount = occupiedRooms
+                  .filter((r) => r.roomName === room.name)
+                  .reduce((sum, r) => sum + (r.roomsCount || 1), 0);
 
-              {/* Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                {group.items.map((amenity, idx) => (
+                const isFull = bookedCount >= ROOM_LIMIT || room.soldOut;
+
+                return (
                   <div
-                    key={idx}
-                    className="group bg-slate-50 hover:bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center cursor-pointer hover:-translate-y-1"
+                    key={room.id}
+                    className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
                   >
-                    {/* Icon */}
-                    <div className="text-[#FFC107] mb-3 flex justify-center group-hover:scale-105 group-hover:drop-shadow-lg transition-all">
-                      {amenity.icon}
+                    <div className="relative h-64 overflow-hidden bg-slate-200">
+                      <div className="absolute top-4 left-4 z-10">
+                        <span
+                          className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
+                            room.soldOut ? "bg-red-500" : "bg-green-500"
+                          }`}
+                        >
+                          {room.soldOut
+                            ? "SOLD OUT"
+                            : `Available (${ROOM_LIMIT - bookedCount} left)`}
+                        </span>
+                      </div>
+                      <img
+                        src={
+                          Array.isArray(room.images) && room.images.length > 0
+                            ? room.images?.[currentImageIndex?.[room.id] ?? 0]
+                            : "https://via.placeholder.com/400"
+                        }
+                        alt={room.name}
+                        width="800"
+                        height="500"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          if (e.target.src.includes("placeholder.com")) return;
+                          e.target.onerror = null;
+                          e.target.src = "https://via.placeholder.com/400";
+                        }}
+                        className="w-full h-full object-cover"
+                      />
+
+                      <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center shadow-md">
+                        <Star
+                          size={16}
+                          className="text-[#FFC107] mr-1 fill-current"
+                        />
+                        <span className="text-sm font-extrabold text-slate-900">
+                          {room.rating}
+                        </span>
+                      </div>
                     </div>
+                    <div className="p-8 flex flex-col flex-grow">
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                        {room.name}
+                      </h3>
+                      <p className="text-slate-600 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed font-medium">
+                        {room.description}
+                      </p>
 
-                    {/* Name */}
-                    <p className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition">
-                      {amenity.name}
-                    </p>
+                      <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-100">
+                        <div>
+                          <span className="text-3xl font-black text-slate-900">
+                            ₹{room.basePrice}
+                          </span>
+                          <span className="text-slate-500 font-medium text-sm">
+                            {" "}
+                            / night
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!room || !room.id) {
+                              alert("Room data error ❌");
+                              return;
+                            }
+                            onSelectRoom(room);
+                          }}
+                          disabled={isFull}
+                          className={`px-6 py-3 rounded-xl font-bold ${
+                            isFull
+                              ? "bg-gray-400 text-white cursor-not-allowed pointer-events-none"
+                              : "bg-[#FFC107] text-slate-900 hover:bg-yellow-400"
+                          }`}
+                        >
+                          {isFull ? "Not Available" : "Book Room"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
+                );
+              })}
+          </div>
         </div>
-      </div>
 
-      {/* Near By places code*/}
+        {/* Amenities Grid matching User Image */}
+        <div
+          id="amenities"
+          className="bg-white py-24 border-t border-slate-100"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-16 text-center">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-[#FFC107] mb-3">
+                Amenities
+              </h2>
+              <p className="text-slate-500 text-lg">
+                Designed for your comfort & luxury
+              </p>
+            </div>
 
-      <div
-        id="nearby"
-        className="bg-gradient-to-b from-slate-100 to-white py-20"
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          {/* TITLE */}
-          <h2 className="text-4xl font-extrabold text-center mb-4">
-            Explore Nearby Places
-          </h2>
-          <p className="text-center text-slate-500 mb-10">
-            Discover attractions, shopping, and essentials around Marella Royal
-            Inn
-          </p>
+            {AMENITIES_GROUPS.map((group, index) => (
+              <div key={index} className="mb-16">
+                {/* Category Title */}
+                <h3 className="text-2xl font-bold text-slate-900 mb-8 border-l-4 border-[#FFC107] pl-4">
+                  {group.title}
+                </h3>
 
-          {/* CATEGORY FILTER */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition 
+                {/* Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {group.items.map((amenity, idx) => (
+                    <div
+                      key={idx}
+                      className="group bg-slate-50 hover:bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center cursor-pointer hover:-translate-y-1"
+                    >
+                      {/* Icon */}
+                      <div className="text-[#FFC107] mb-3 flex justify-center group-hover:scale-105 group-hover:drop-shadow-lg transition-all">
+                        {amenity.icon}
+                      </div>
+
+                      {/* Name */}
+                      <p className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition">
+                        {amenity.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Near By places code*/}
+
+        <div
+          id="nearby"
+          className="bg-gradient-to-b from-slate-100 to-white py-20"
+        >
+          <div className="max-w-7xl mx-auto px-4">
+            {/* TITLE */}
+            <h2 className="text-4xl font-extrabold text-center mb-4">
+              Explore Nearby Places
+            </h2>
+            <p className="text-center text-slate-500 mb-10">
+              Discover attractions, shopping, and essentials around Marella
+              Royal Inn
+            </p>
+
+            {/* CATEGORY FILTER */}
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition 
           ${
             activeCategory === cat
               ? "bg-[#FFC107] text-black shadow-md"
               : "bg-white text-slate-600 border hover:bg-[#FFC107]/20"
           }`}
-              >
-                {cat}
-              </button>
-            ))}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPlaces.map((place, index) => (
+                <div
+                  key={index}
+                  className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                >
+                  {/* IMAGE */}
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={place.image}
+                      alt={place.name}
+                      width="800"
+                      height="500"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-52 object-cover group-hover:scale-105 transition duration-500"
+                    />
+
+                    {/* CATEGORY BADGE */}
+                    <span className="absolute top-3 left-3 bg-black/70 text-white text-xs px-3 py-1 rounded-full">
+                      {place.category}
+                    </span>
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {place.name}
+                    </h3>
+
+                    <p className="text-sm text-[#FFC107] font-semibold mt-1">
+                      📍 {place.distance}
+                    </p>
+
+                    <p className="text-sm text-slate-600 mt-2">
+                      {place.description}
+                    </p>
+
+                    <a
+                      href={`https://www.google.com/maps?q=${place.name}+Bangalore`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline"
+                    >
+                      Get Directions →
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          {/* GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPlaces.map((place, index) => (
-              <div
-                key={index}
-                className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
-              >
-                {/* IMAGE */}
-                <div className="relative overflow-hidden">
-                  <img
-                    src={place.image}
-                    alt={place.name}
-                    width="800"
-                    height="500"
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-52 object-cover group-hover:scale-105 transition duration-500"
-                  />
+        {/* Google Maps Location Section */}
+        <div id="contact" className="bg-slate-50 py-20 text-center">
+          <h2 className="text-4xl font-bold mb-6">Find Us</h2>
 
-                  {/* CATEGORY BADGE */}
-                  <span className="absolute top-3 left-3 bg-black/70 text-white text-xs px-3 py-1 rounded-full">
-                    {place.category}
-                  </span>
-                </div>
-
-                {/* CONTENT */}
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900">
-                    {place.name}
-                  </h3>
-
-                  <p className="text-sm text-[#FFC107] font-semibold mt-1">
-                    📍 {place.distance}
-                  </p>
-
-                  <p className="text-sm text-slate-600 mt-2">
-                    {place.description}
-                  </p>
-
-                  <a
-                    href={`https://www.google.com/maps?q=${place.name}+Bangalore`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline"
-                  >
-                    Get Directions →
-                  </a>
-                </div>
-              </div>
-            ))}
+          <div className="max-w-6xl mx-auto h-[400px] rounded-xl overflow-hidden shadow">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d972.2652334599069!2d77.51897199999996!3d12.903803400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3fb2a7a436d9%3A0xc61c8aa7fed06f1b!2sHotel%20Marella%20Royal%20Inn!5e0!3m2!1sen!2sin!4v1776081433728!5m2!1sen!2sin"
+              className="w-full h-full border-0"
+              loading="lazy"
+            ></iframe>
           </div>
         </div>
       </div>
-
-      {/* Google Maps Location Section */}
-      <div id="contact" className="bg-slate-50 py-20 text-center">
-        <h2 className="text-4xl font-bold mb-6">Find Us</h2>
-
-        <div className="max-w-6xl mx-auto h-[400px] rounded-xl overflow-hidden shadow">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d972.2652334599069!2d77.51897199999996!3d12.903803400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3fb2a7a436d9%3A0xc61c8aa7fed06f1b!2sHotel%20Marella%20Royal%20Inn!5e0!3m2!1sen!2sin!4v1776081433728!5m2!1sen!2sin"
-            className="w-full h-full border-0"
-            loading="lazy"
-          ></iframe>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 
