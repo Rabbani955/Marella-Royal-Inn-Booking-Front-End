@@ -1633,62 +1633,166 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
         </div>
 
         {/* Availability Search */}
+        {/* ================================
+    SEO Friendly Availability Search
+================================ */}
 
-        <div className="bg-white py-10 shadow-md">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="bg-white rounded-2xl border p-6 shadow">
-              <h2 className="text-2xl font-bold text-center mb-6">
-                Check Room Availability
-              </h2>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="mb-4">
-                  <label className="block mb-2 font-semibold text-slate-700">
-                    Check In
-                  </label>
-
-                  <input
-                    type="date"
-                    value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full p-3 border rounded-lg"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block mb-2 font-semibold text-slate-700">
-                    Check Out
-                  </label>
-
-                  <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full p-3 border rounded-lg"
-                  />
-                </div>
-
-                <button
-                  onClick={checkAvailability}
-                  disabled={isSearching}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold"
+        <section
+          aria-labelledby="availability-heading"
+          className="bg-gradient-to-b from-slate-100 via-white to-slate-50 py-14"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                checkAvailability();
+              }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-white px-8 py-8 border-b border-slate-200">
+                <h2
+                  id="availability-heading"
+                  className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center tracking-tight"
                 >
-                  {isSearching ? "Checking..." : "Check Availability"}
-                </button>
-                <button
-                  onClick={() => {
-                    setAvailableRooms([]);
-                    setCheckIn("");
-                    setCheckOut("");
-                  }}
-                  className="bg-gray-500 text-white rounded-lg font-bold p-3"
-                >
-                  Reset
-                </button>
+                  Check Room Availability
+                </h2>
+
+                <div className="w-24 h-1 bg-[#FFC107] mx-auto rounded-full mt-4 mb-5"></div>
+
+                <p className="text-center text-slate-500 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                  Select your preferred check-in and check-out dates to
+                  instantly view room availability and book directly with the
+                  best guaranteed price.
+                </p>
               </div>
-            </div>
+
+              {/* Search Fields */}
+
+              <div className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-end">
+                  {/* Check In */}
+
+                  <div>
+                    <label
+                      htmlFor="checkIn"
+                      className="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Check In
+                    </label>
+
+                    <input
+                      id="checkIn"
+                      name="checkIn"
+                      type="date"
+                      required
+                      autoComplete="off"
+                      aria-label="Check In Date"
+                      value={checkIn}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full h-14 rounded-xl border-2 border-slate-200 px-4 text-slate-700 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:border-yellow-500 transition"
+                    />
+                  </div>
+
+                  {/* Check Out */}
+
+                  <div>
+                    <label
+                      htmlFor="checkOut"
+                      className="block text-sm font-bold text-slate-700 mb-2"
+                    >
+                      Check Out
+                    </label>
+
+                    <input
+                      id="checkOut"
+                      name="checkOut"
+                      type="date"
+                      required
+                      autoComplete="off"
+                      aria-label="Check Out Date"
+                      value={checkOut}
+                      min={checkIn || new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      className="w-full h-14 rounded-xl border-2 border-slate-200 px-4 text-slate-700 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:border-yellow-500 transition"
+                    />
+                  </div>
+
+                  {/* Search Button */}
+
+                  <button
+                    type="submit"
+                    disabled={isSearching}
+                    aria-label="Check Room Availability"
+                    className="h-14 rounded-xl bg-[#FFC107] hover:bg-yellow-500 text-slate-900 font-bold text-lg shadow-lg hover:shadow-xl transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isSearching ? (
+                      <span className="flex items-center justify-center gap-3">
+                        <svg
+                          className="animate-spin h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            opacity=".25"
+                          />
+
+                          <path
+                            d="M22 12A10 10 0 0012 2"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                        </svg>
+                        Checking...
+                      </span>
+                    ) : (
+                      "Check Availability"
+                    )}
+                  </button>
+
+                  {/* Reset */}
+
+                  <button
+                    type="button"
+                    aria-label="Reset Dates"
+                    onClick={() => {
+                      setAvailableRooms([]);
+                      setCheckIn("");
+                      setCheckOut("");
+                    }}
+                    className="h-14 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-bold text-lg shadow-lg hover:shadow-xl transition"
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                {/* Selected Dates */}
+
+                {(checkIn || checkOut) && (
+                  <div className="mt-8 flex flex-wrap justify-center gap-4">
+                    {checkIn && (
+                      <div className="bg-green-100 text-green-800 border border-green-300 px-5 py-2 rounded-full font-semibold">
+                        ✓ Check In :<span className="ml-2">{checkIn}</span>
+                      </div>
+                    )}
+
+                    {checkOut && (
+                      <div className="bg-blue-100 text-blue-800 border border-blue-300 px-5 py-2 rounded-full font-semibold">
+                        ✓ Check Out :<span className="ml-2">{checkOut}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </form>
           </div>
-        </div>
+        </section>
 
         {/* Room Listing */}
         <div
