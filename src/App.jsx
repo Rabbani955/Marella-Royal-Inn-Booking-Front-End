@@ -541,12 +541,17 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token && token !== "null" && token !== "undefined") {
-      setIsAdminLoggedIn(true);
-      fetchBookings();
-    } else {
+    if (!token || token === "null" || token === "undefined") {
       setIsAdminLoggedIn(false);
+      return;
     }
+
+    setIsAdminLoggedIn(true);
+
+    fetchBookings().catch(() => {
+      localStorage.removeItem("token");
+      setIsAdminLoggedIn(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -685,71 +690,83 @@ Special Request: ${formData.message || "None"}`;
       console.log("✅ Booking saved successfully");
       console.log("STEP 4 - Booking saved successfully");
 
-
       // =========================================
       // ✅ RUN ONLY AFTER SUCCESS
       // =========================================
 
       // ✅ WhatsApp
-   // =========================================
-// BOOKING SUCCESS
-// =========================================
+      // =========================================
+      // BOOKING SUCCESS
+      // =========================================
 
-// TEST
-alert("SUCCESS PAGE WILL OPEN");
-setCurrentView("success");
-return;
+      fetchOccupiedRooms();
 
-// ✅ Refresh occupied rooms
-fetchOccupiedRooms();
+      // Show success page
+      console.log("Reached Success Page");
+      setCurrentView("success");
 
-// ✅ Open WhatsApp after success page
-setTimeout(() => {
-  window.open(whatsappUrl, "_blank");
-}, 500);
+      // Open WhatsApp after 500ms
+      setTimeout(() => {
+        window.open(whatsappUrl, "_blank");
+      }, 500);
 
-// ✅ Send hotel email (background)
-fetch("https://api.emailjs.com/api/v1.0/email/send", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    service_id: "service_79vxn5l",
-    template_id: "template_hj48bne",
-    user_id: "n94jEJBXkDeCf_eH4",
-    template_params: templateParams,
-  }),
-})
-.then((res) => console.log("Hotel Email:", res.status))
-.catch((err) => console.error("Hotel Email Error:", err));
+      // Send Hotel Email
+      try {
+        const hotelEmail = await fetch(
+          "https://api.emailjs.com/api/v1.0/email/send",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              service_id: "service_79vxn5l",
+              template_id: "template_hj48bne",
+              user_id: "n94jEJBXkDeCf_eH4",
+              template_params: templateParams,
+            }),
+          },
+        );
 
-// ✅ Send guest email (background)
-fetch("https://api.emailjs.com/api/v1.0/email/send", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    service_id: "service_79vxn5l",
-    template_id: "template_lf1532q",
-    user_id: "n94jEJBXkDeCf_eH4",
-    template_params: {
-      ...templateParams,
-      to_email: formData.email,
-    },
-  }),
-})
-.then((res) => console.log("Guest Email:", res.status))
-.catch((err) => console.error("Guest Email Error:", err));
- } catch (err) {
+        console.log("Hotel Email Status:", hotelEmail.status);
+        console.log(await hotelEmail.text());
+      } catch (err) {
+        console.error("Hotel Email Error:", err);
+      }
+
+      // Send Guest Email
+      try {
+        const guestEmail = await fetch(
+          "https://api.emailjs.com/api/v1.0/email/send",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              service_id: "service_79vxn5l",
+              template_id: "template_lf1532q",
+              user_id: "n94jEJBXkDeCf_eH4",
+              template_params: {
+                ...templateParams,
+                to_email: formData.email,
+              },
+            }),
+          },
+        );
+
+        console.log("Guest Email Status:", guestEmail.status);
+        console.log(await guestEmail.text());
+      } catch (err) {
+        console.error("Guest Email Error:", err);
+      }
+    } catch (err) {
       console.error("❌ Error:", err);
       alert(err.message || "Booking failed ❌");
     } finally {
       setIsSubmitting(false);
     }
   };
-
 
   const goHome = () => {
     setCurrentView("home");
@@ -1064,8 +1081,12 @@ fetch("https://api.emailjs.com/api/v1.0/email/send", {
           <div className="border-t border-slate-700 mt-10 pt-6 flex justify-center">
             <div className="bg-slate-800 px-6 py-3 rounded-xl shadow-lg border border-slate-600">
               <img
-                src="https://api.visitorbadge.io/api/visitors?path=hotelmarellaroyalinn.in&label=👥%20Website%20Visitors&countColor=%23FFC107&labelColor=%23374151"
+                src="https://api.visitorbadge.io/api/combined?path=hotelmarellaroyalinn.in&label=Website%20Visitors&labelColor=%23374151&countColor=%23FFC107&style=flat"
                 alt="Website Visitors"
+                onError={(e) => {
+                  console.error("Visitor counter failed");
+                  e.target.style.display = "none";
+                }}
               />
             </div>
           </div>
