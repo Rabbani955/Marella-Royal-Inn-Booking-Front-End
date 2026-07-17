@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import WelcomePopup from "./WelcomePopup";
 import MyBooking from "./MyBooking";
 import AdminLogin from "./AdminLogin";
+import { useState, useEffect, useRef } from "react";
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 import {
   Calendar,
@@ -1304,6 +1305,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
   const [checkOut, setCheckOut] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [availableRooms, setAvailableRooms] = useState([]);
+  const roomsSectionRef = useRef(null);
 
   const ROOM_LIMIT = 5;
 
@@ -1517,6 +1519,13 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
       });
 
       setAvailableRooms(mergedRooms);
+
+      setTimeout(() => {
+        roomsSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
     } catch (err) {
       console.error(err);
       alert("Failed to check availability");
@@ -1797,6 +1806,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
         {/* Room Listing */}
         <div
           id="rooms"
+          ref={roomsSectionRef}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-slate-200"
         >
           <div className="text-center mb-16">
