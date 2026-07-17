@@ -1842,7 +1842,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                     key={room.id}
                     className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
                   >
-                    <div className="relative h-96 md:h-64 overflow-hidden bg-slate-200">
+                    <div className="relative h-200 md:h-64 overflow-hidden bg-slate-200">
                       <div className="absolute top-4 left-4 z-10">
                         <span
                           className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
