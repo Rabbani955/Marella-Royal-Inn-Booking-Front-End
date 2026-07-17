@@ -1108,47 +1108,48 @@ Special Request: ${formData.message || "None"}`;
 
         
 
+{/* ================= Floating Contact Buttons ================= */}
+<div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-5">
 
-        {/* ================= Floating Contact Buttons ================= */}
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
-          {/* Call Button */}
-          <div className="group relative">
-            <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
-              📞 Call Us
-            </span>
+  {/* Call Button */}
+  <div className="group relative">
+    <span className="absolute right-24 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+      📞 Call Us
+    </span>
 
-            <a
-              href="tel:+917795951743"
-              title="Call Hotel Marella Royal Inn"
-              aria-label="Call Hotel Marella Royal Inn"
-              className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:scale-110 transition-all duration-300 animate-pulse"
-            >
-              <Phone size={30} />
-            </a>
-          </div>
+    <a
+      href="tel:+917795951743"
+      title="Call Hotel Marella Royal Inn"
+      aria-label="Call Hotel Marella Royal Inn"
+      className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-google"
+    >
+      <Phone size={40} strokeWidth={2.5} />
+    </a>
+  </div>
 
-          {/* WhatsApp Button */}
-          <div className="group relative">
-            <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
-              💬 WhatsApp
-            </span>
+  {/* WhatsApp Button */}
+  <div className="group relative">
+    <span className="absolute right-24 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+      💬 WhatsApp
+    </span>
 
-            <a
-              href="https://wa.me/917795951743"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Chat on WhatsApp"
-              aria-label="Chat on WhatsApp"
-              className="flex items-center justify-center w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl hover:scale-110 transition-all duration-300"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 32 32"
-                className="w-8 h-8 fill-white"
-              >
-                <path d="M16.01 3C8.83 3 3 8.74 3 15.83c0 2.5.73 4.93 2.12 7L3 29l6.35-2.06a13.03 13.03 0 006.66 1.81C23.18 28.75 29 23.01 29 15.92 29 8.83 23.19 3 16.01 3zm0 23.43c-2.08 0-4.12-.56-5.91-1.62l-.42-.25-3.77 1.22 1.23-3.67-.28-.43a10.33 10.33 0 01-1.67-5.55c0-5.74 4.73-10.41 10.54-10.41 5.81 0 10.54 4.67 10.54 10.41 0 5.75-4.73 10.3-10.26 10.3zm5.8-7.87c-.32-.16-1.9-.93-2.19-1.03-.29-.11-.5-.16-.71.16-.21.31-.82 1.03-1.01 1.24-.18.21-.37.24-.69.08-.32-.16-1.35-.49-2.57-1.56-.95-.84-1.6-1.88-1.79-2.2-.19-.32-.02-.49.14-.65.15-.15.32-.37.48-.55.16-.18.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.72-.97-2.35-.26-.63-.53-.54-.71-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.44 5.48 4.82.77.33 1.37.53 1.84.68.77.24 1.47.21 2.02.13.62-.09 1.9-.78 2.17-1.54.27-.76.27-1.41.19-1.54-.08-.13-.29-.21-.61-.37z" />
-              </svg>
-            </a>
+    <a
+      href="https://wa.me/917795951743"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Chat on WhatsApp"
+      aria-label="Chat on WhatsApp"
+      className="flex items-center justify-center w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-google"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 32 32"
+        className="w-10 h-10 fill-white"
+      >
+        <path d="M16.01 3C8.83 3 3 8.74 3 15.83c0 2.5.73 4.93 2.12 7L3 29l6.35-2.06a13.03 13.03 0 006.66 1.81C23.18 28.75 29 23.01 29 15.92 29 8.83 23.19 3 16.01 3zm0 23.43c-2.08 0-4.12-.56-5.91-1.62l-.42-.25-3.77 1.22 1.23-3.67-.28-.43a10.33 10.33 0 01-1.67-5.55c0-5.74 4.73-10.41 10.54-10.41 5.81 0 10.54 4.67 10.54 10.41 0 5.75-4.73 10.3-10.26 10.3zm5.8-7.87c-.32-.16-1.9-.93-2.19-1.03-.29-.11-.5-.16-.71.16-.21.31-.82 1.03-1.01 1.24-.18.21-.37.24-.69.08-.32-.16-1.35-.49-2.57-1.56-.95-.84-1.6-1.88-1.79-2.2-.19-.32-.02-.49.14-.65.15-.15.32-.37.48-.55.16-.18.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.72-.97-2.35-.26-.63-.53-.54-.71-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.44 5.48 4.82.77.33 1.37.53 1.84.68.77.24 1.47.21 2.02.13.62-.09 1.9-.78 2.17-1.54.27-.76.27-1.41.19-1.54-.08-.13-.29-.21-.61-.37z"/>
+      </svg>
+    </a>
+
           </div>
         </div>
       </div>
