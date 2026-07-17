@@ -1,9 +1,8 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import WelcomePopup from "./WelcomePopup";
 import MyBooking from "./MyBooking";
 import AdminLogin from "./AdminLogin";
-import { useState, useEffect, useRef } from "react";
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 import {
   Calendar,
@@ -1756,9 +1755,9 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                             cx="12"
                             cy="12"
                             r="10"
+                            opacity=".25"
                             stroke="currentColor"
                             strokeWidth="4"
-                            opacity=".25"
                           />
 
                           <path
