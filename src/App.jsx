@@ -2649,7 +2649,7 @@ function CheckoutView({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-10 sm:px-6 lg:px-8 py-10 animate-in slide-in-from-right-8 duration-300">
+    <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-10 animate-in slide-in-from-right-8 duration-300">
       <button
         onClick={onBack}
         className="flex items-center text-slate-600 hover:text-[#FFC107] mb-8 transition-colors font-bold bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 w-fit"
