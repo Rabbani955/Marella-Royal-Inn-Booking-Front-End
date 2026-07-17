@@ -1307,6 +1307,15 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
   const [availableRooms, setAvailableRooms] = useState([]);
   const roomsSectionRef = useRef(null);
 
+  useEffect(() => {
+    if (availableRooms.length > 0) {
+      roomsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [availableRooms]);
+
   const ROOM_LIMIT = 5;
 
   const nearbyPlaces = [
