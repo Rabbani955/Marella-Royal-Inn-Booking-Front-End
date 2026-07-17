@@ -1121,7 +1121,7 @@ Special Request: ${formData.message || "None"}`;
               href="tel:+917795951743"
               title="Call Hotel Marella Royal Inn"
               aria-label="Call Hotel Marella Royal Inn"
-              className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:scale-110 transition-all duration-300 animate-pulse"
+              className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:scale-110 transition-all duration-300 animate-pulse"
             >
               <Phone size={30} />
             </a>
@@ -1139,7 +1139,7 @@ Special Request: ${formData.message || "None"}`;
               rel="noopener noreferrer"
               title="Chat on WhatsApp"
               aria-label="Chat on WhatsApp"
-              className="flex items-center justify-center w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl hover:scale-110 transition-all duration-300"
+              className="flex items-center justify-center w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl hover:scale-110 transition-all duration-300"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
