@@ -1956,7 +1956,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                             onSelectRoom(room);
                           }}
                           disabled={isFull}
-                          className={`px-6 py-3 rounded-xl font-bold ${
+                          className={`px-8 py-4 rounded-xl font-bold text-lg ${
                             isFull
                               ? "bg-gray-400 text-white cursor-not-allowed pointer-events-none"
                               : "bg-[#FFC107] text-slate-900 hover:bg-yellow-400"
