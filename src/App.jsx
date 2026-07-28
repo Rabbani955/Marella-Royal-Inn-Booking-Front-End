@@ -1874,19 +1874,19 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                   <div
                     key={room.id}
                     className="
-    bg-white
-    rounded-[32px] md:rounded-3xl
-    overflow-hidden
-    border border-slate-200
-    shadow-xl
-    hover:shadow-2xl
-    transition-all
-    duration-300
-    flex
-    flex-col
-    mx-2
-    sm:mx-0
-  "
+                      bg-white
+                      rounded-[32px] md:rounded-3xl
+                      overflow-hidden
+                      border border-slate-200
+                      shadow-xl
+                      hover:shadow-2xl
+                      transition-all
+                      duration-300
+                      flex
+                      flex-col
+                      mx-1 sm:mx-0
+                      sm:mx-0
+                    "
                   >
                     <div className="relative h-[380px] md:h-64 overflow-hidden rounded-t-[32px] bg-slate-200">
                       <div className="absolute top-4 left-4 z-10">
