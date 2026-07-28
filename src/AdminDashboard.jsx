@@ -46,19 +46,30 @@ export default function AdminDashboard({
     try {
       const token = localStorage.getItem("token");
 
-      await fetch(
+      const res = await fetch(
         `https://hotel-backend-jqdh.onrender.com/api/rooms/admin/update-price/${id}?price=${editingPrice[id]}`,
         {
           method: "PUT",
-          headers: { Authorization: "Bearer " + token },
+          headers: {
+            Authorization: "Bearer " + token,
+          },
         },
       );
 
-      toast.success("Price updated");
-      fetchRooms();
-      refreshRooms();
-    } catch {
-      toast.error("Update failed");
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      toast.success("Price updated successfully");
+
+      await fetchRooms();
+
+      if (refreshRooms) {
+        await refreshRooms();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Price update failed");
     }
   };
 
@@ -66,17 +77,30 @@ export default function AdminDashboard({
     try {
       const token = localStorage.getItem("token");
 
-      await fetch(
+      const res = await fetch(
         `https://hotel-backend-jqdh.onrender.com/api/rooms/admin/soldout/${id}?status=${!currentStatus}`,
         {
           method: "PUT",
-          headers: { Authorization: "Bearer " + token },
+          headers: {
+            Authorization: "Bearer " + token,
+          },
         },
       );
 
-      fetchRooms();
-    } catch {
-      toast.error("Error updating");
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      toast.success("Availability updated");
+
+      await fetchRooms();
+
+      if (refreshRooms) {
+        await refreshRooms();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update availability");
     }
   };
 
@@ -85,10 +109,11 @@ export default function AdminDashboard({
       toast.error("Please select Start Date and End Date");
       return;
     }
+
     try {
       const token = localStorage.getItem("token");
 
-      await fetch(
+      const res = await fetch(
         "https://hotel-backend-jqdh.onrender.com/api/rooms/admin/date-soldout",
         {
           method: "POST",
@@ -105,15 +130,25 @@ export default function AdminDashboard({
         },
       );
 
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+      }
+
       toast.success("Room blocked successfully");
-      fetchRooms();
-      refreshRooms();
-    } catch {
-      toast.error("Failed to block room");
+
+      await fetchRooms();
+
+      if (refreshRooms) {
+        await refreshRooms();
+      }
+    } catch (err) {
+      console.error("Hold Date Error:", err);
+      toast.error(err.message || "Failed to block room");
     }
   };
 
- const handleCheckout = async (id, roomId) => {
+  const handleCheckout = async (id, roomId) => {
     const token = localStorage.getItem("token");
 
     await fetch(
