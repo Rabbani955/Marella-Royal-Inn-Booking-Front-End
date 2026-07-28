@@ -1879,7 +1879,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                     key={room.id}
                     className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
                   >
-                    <div className="relative h-80 md:h-64 overflow-hidden bg-slate-200">
+                    <div className="relative h-96 md:h-64 overflow-hidden bg-slate-200">
                       <div className="absolute top-4 left-4 z-10">
                         <span
                           className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
@@ -1920,7 +1920,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                         </span>
                       </div>
                     </div>
-                    <div className="p-8 flex flex-col flex-grow">
+                    <div className="p-10 flex flex-col flex-grow">
                       <h3 className="text-2xl font-bold text-slate-900 mb-3">
                         {room.name}
                       </h3>
@@ -1968,9 +1968,9 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
           id="amenities"
           className="bg-white py-24 border-t border-slate-100"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-[#FFC107] mb-3">
+              <h2 className="text-5xl md:text-5xl font-extrabold text-[#FFC107] mb-3">
                 Amenities
               </h2>
               <p className="text-slate-500 text-lg">
