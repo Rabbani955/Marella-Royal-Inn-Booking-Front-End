@@ -1196,20 +1196,20 @@ function AdminView({ bookings, rooms, onBack, onDelete, onCheckout }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-sm text-gray-500">Available Rooms</h3>
-          <p className="text-2xl font-bold">{availableRooms}</p>
+          <p className="text-4xl md:text-5xl font-extrabold">{availableRooms}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-sm text-gray-500">Total Bookings</h3>
-          <p className="text-2xl font-bold">{(bookings || []).length}</p>
+          <p className="text-4xl md:text-5xl font-extrabold">{(bookings || []).length}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-sm text-gray-500">Total Revenue</h3>
-          <p className="text-2xl font-bold">₹{totalRevenue}</p>
+          <p className="text-4xl md:text-5xl font-extrabold">₹{totalRevenue}</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-sm text-gray-500">Today Bookings</h3>
-          <p className="text-2xl font-bold">
+          <p className="text-4xl md:text-5xl font-extrabold">
             {
               (bookings || []).filter(
                 (b) =>
@@ -1723,7 +1723,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
 
               {/* Search Fields */}
 
-              <div className="p-8">
+              <div className="p-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-end">
                   {/* Check In */}
 
@@ -1865,7 +1865,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
             {Array.isArray(roomsToShow) &&
               roomsToShow.map((room) => {
                 const bookedCount = occupiedRooms
@@ -1877,9 +1877,9 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                 return (
                   <div
                     key={room.id}
-                    className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
+                    className="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-slate-200"
                   >
-                    <div className="relative h-80 md:h-64 overflow-hidden bg-slate-200">
+                    <div className="relative h-[460px] md:h-72 overflow-hidden bg-slate-200">
                       <div className="absolute top-4 left-4 z-10">
                         <span
                           className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
