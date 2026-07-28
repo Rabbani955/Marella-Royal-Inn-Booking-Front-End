@@ -1879,7 +1879,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                     key={room.id}
                     className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-[#FFC107] transition-all duration-300 group flex flex-col hover:-translate-y-1"
                   >
-                    <div className="relative h-80 md:h-64 overflow-hidden bg-slate-200">
+                    <div className="relative h-[340px] md:h-[380px] overflow-hidden bg-slate-200">
                       <div className="absolute top-4 left-4 z-10">
                         <span
                           className={`text-white px-3 py-1 rounded-full text-xs font-bold ${
@@ -1920,11 +1920,11 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                         </span>
                       </div>
                     </div>
-                    <div className="p-8 flex flex-col flex-grow">
-                      <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    <div className="p-10 flex flex-col flex-grow">
+                      <h3 className="text-3xl font-bold text-slate-900 mb-3">
                         {room.name}
                       </h3>
-                      <p className="text-slate-600 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed font-medium">
+                      <p className="text-slate-600 text-base line-clamp-3 mb-6 flex-grow leading-relaxed font-medium">
                         {room.description}
                       </p>
 
@@ -1947,7 +1947,7 @@ function HomeView({ rooms, onSelectRoom, occupiedRooms }) {
                             onSelectRoom(room);
                           }}
                           disabled={isFull}
-                          className={`px-6 py-3 rounded-xl font-bold ${
+                          className={`px-8 py-4 text-lg rounded-xl font-bold ${
                             isFull
                               ? "bg-gray-400 text-white cursor-not-allowed pointer-events-none"
                               : "bg-[#FFC107] text-slate-900 hover:bg-yellow-400"
@@ -2308,7 +2308,7 @@ function RoomDetailsView({ room, onBack, onProceed, occupiedRooms }) {
         </div>
         {/* Right Side: Date Selection, Guests & Price */}
         <div className="lg:w-2/5 bg-slate-50 p-10 border-l border-slate-100 flex flex-col">
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-8">
+          <h2 className="text-4xl font-extrabold text-slate-900 mb-8">
             Booking Details
           </h2>
           <div className="space-y-6 flex-grow">
